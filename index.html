@@ -1,0 +1,1984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Test - Student</title>
+    <!-- Use standard web fonts similar to Typing.com (Arial/Helvetica/sans-serif) -->
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-body: #f4f5f7;
+            --bg-content: #ffffff;
+            --text-main: #333333;
+            --text-muted: #888888;
+            --text-correct: #22c55e;  /* Green for correct letters */
+            --text-upcoming: #333333;
+            --error-color: #ffffff;
+            --error-bg: #ff4c4c;
+            --primary-blue: #0073e6;
+            --border-color: #e1e4e8;
+            --caret-color: #0073e6;
+            --font-main: 'Open Sans', Arial, sans-serif;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #1e1e1e;
+            --bg-content: #2d2d2d;
+            --text-main: #ffffff;
+            --text-muted: #aaaaaa;
+            --text-correct: #22c55e;  /* Green stays green in dark mode too */
+            --text-upcoming: #ffffff;
+            --error-color: #ffffff;
+            --error-bg: #ff4c4c;
+            --border-color: #444444;
+        }
+
+        /* ======== SETTINGS PANEL STYLES ======== */
+        .settings-btn {
+            background: var(--bg-content);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 46px;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            transition: background 0.2s, transform 0.3s;
+            color: var(--text-muted);
+        }
+        .settings-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: rotate(45deg);
+        }
+        .settings-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        /* Settings Drawer */
+        .settings-drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100vh;
+            width: 300px;
+            background: var(--bg-content);
+            border-left: 1px solid var(--border-color);
+            box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+            z-index: 999;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 0;
+        }
+        .settings-drawer.open {
+            transform: translateX(0);
+        }
+        .settings-drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+        .settings-drawer-header h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        .settings-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            line-height: 1;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+        .settings-close:hover { color: var(--text-main); }
+
+        /* Setting Row */
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .setting-info {
+            flex: 1;
+            padding-right: 16px;
+        }
+        .setting-info label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-main);
+            display: block;
+            margin-bottom: 4px;
+            cursor: pointer;
+        }
+        .setting-info p {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Toggle Switch */
+        .toggle {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: #ccc;
+            border-radius: 26px;
+            transition: 0.3s;
+        }
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            top: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+        .toggle input:checked + .toggle-slider {
+            background-color: var(--primary-blue);
+        }
+        .toggle input:checked + .toggle-slider::before {
+            transform: translateX(20px);
+        }
+
+        /* Overlay backdrop for drawer */
+        .drawer-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 998;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .drawer-backdrop.visible {
+            display: block;
+            opacity: 1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            width: 100%;
+            background-color: var(--bg-content);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+            padding: 0 20px;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .nav-container {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+        }
+
+        .nav-logo {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-logo svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--primary-blue);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 10px 0;
+            border-bottom: 3px solid transparent;
+            transition: color 0.2s, border-color 0.2s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .nav-link:hover, .nav-link.active, .nav-item.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+
+        .dropdown-wrapper { position: relative; }
+        .dropdown-menu {
+            position: absolute;
+            top: 45px;
+            left: 0;
+            background: var(--bg-content);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: none;
+            flex-direction: column;
+            width: 150px;
+            z-index: 1000;
+        }
+        .dropdown-wrapper:hover .dropdown-menu { display: flex; }
+        
+        .nav-item {
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+        .nav-item:hover { background: var(--bg-body); color: var(--primary-blue); }
+
+        #badge-notif {
+            background: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            display: none;
+        }
+
+        /* Blog Card Styles */
+        .blog-card {
+            background: var(--bg-content);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            border: 1px solid var(--border-color);
+        }
+        .blog-card img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 4px; }
+        .blog-title { font-size: 1.5rem; font-weight: 700; color: var(--primary-blue); margin: 0; }
+        .blog-meta { font-size: 0.85rem; color: var(--text-muted); }
+        .blog-content { font-size: 1rem; line-height: 1.6; }
+        .btn-mark-read { align-self: flex-start; background: var(--primary-blue); color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: 600; }
+        .btn-mark-read:hover { background: #005bb5; }
+        .notif-item { padding: 10px; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
+        .notif-item:last-child { border-bottom: none; }
+
+        /* Main Content Container */
+        .main-container {
+            width: 100%;
+            max-width: 1000px;
+            margin-top: 40px;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            background-color: var(--bg-content);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* Typing Area */
+        .typing-card {
+            background-color: var(--bg-content);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 40px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            position: relative;
+            height: 250px; /* Fixed height for scroll masking */
+            overflow: hidden; /* Hide overflowing scrolled text */
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .typing-text {
+            font-size: 2rem; /* Increased font size */
+            line-height: 1.8;
+            color: var(--text-upcoming);
+            position: relative;
+            outline: none;
+            user-select: none;
+            transition: transform 0.2s ease-out; /* Smooth scrolling */
+        }
+
+        .letter {
+            position: relative;
+        }
+
+        .letter.correct {
+            color: var(--text-correct);
+        }
+
+        .letter.incorrect {
+            background-color: var(--error-bg);
+            color: var(--error-color);
+            border-radius: 4px;
+        }
+
+        /* Typing.com style Cursor (Underline) */
+        .caret {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--caret-color);
+            z-index: 10;
+        }
+
+        .letter.active-caret {
+            position: relative;
+        }
+        
+        .letter.active-caret::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background-color: var(--caret-color);
+            border-radius: 2px;
+            animation: blink 1s infinite;
+        }
+
+        .typing-card.typing .letter.active-caret::after {
+            animation: none;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Focus Overlay */
+        .focus-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 8px;
+            z-index: 20;
+            cursor: pointer;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        [data-theme="dark"] .focus-overlay {
+            background: rgba(45, 45, 45, 0.8);
+        }
+
+        .focus-overlay.visible {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .play-button {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 70px; /* Made slightly bigger */
+            height: 70px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 115, 230, 0.3);
+            margin-bottom: 15px;
+        }
+
+        .play-button svg {
+            width: 30px;
+            height: 30px;
+            fill: white;
+            margin-left: 4px; /* Optical alignment */
+        }
+
+        .focus-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* Restart Button */
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+            gap: 15px;
+        }
+
+        .btn-restart {
+            background-color: transparent;
+            color: var(--text-muted);
+            border: 2px solid var(--border-color);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-restart:hover {
+            color: var(--text-main);
+            border-color: var(--text-muted);
+        }
+
+        /* Results Screen */
+        .results-card {
+            background-color: var(--bg-content);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 40px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .results-title {
+            font-size: 2rem;
+            color: var(--text-main);
+            margin-bottom: 30px;
+        }
+
+        .results-stats {
+            display: flex;
+            gap: 50px;
+            margin-bottom: 40px;
+        }
+
+        .res-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .res-val {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            line-height: 1;
+        }
+
+        .res-lbl {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #005bb5;
+        }
+        
+        #hidden-input {
+            position: absolute;
+            opacity: 0;
+            z-index: -1;
+        }
+        /* ======== AUTH & AVATAR STYLES ======== */
+        .auth-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .btn-auth {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 0.9rem;
+        }
+        .btn-auth:hover { background-color: #005bb5; }
+
+        .avatar-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            user-select: none;
+        }
+
+        .avatar-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: var(--bg-content);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 200px;
+            display: none;
+            flex-direction: column;
+            z-index: 1001;
+            overflow: hidden;
+        }
+        .avatar-dropdown.show { display: flex; }
+
+        .dropdown-item {
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .dropdown-item:last-child { border-bottom: none; }
+        .dropdown-item:hover { background-color: var(--bg-body); }
+
+        /* Auth Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.show { display: flex; }
+        
+        .auth-modal {
+            background: var(--bg-content);
+            width: 100%;
+            max-width: 400px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .auth-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            background: var(--bg-body);
+            color: var(--text-muted);
+        }
+        .auth-tab.active {
+            background: var(--bg-content);
+            color: var(--primary-blue);
+            border-bottom: 2px solid var(--primary-blue);
+        }
+
+        .auth-body { padding: 25px; }
+        .auth-form { display: none; flex-direction: column; gap: 15px; }
+        .auth-form.active { display: flex; }
+
+        .auth-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            background: var(--bg-body);
+            color: var(--text-main);
+        }
+        .auth-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .btn-submit {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-submit:hover { background-color: #005bb5; }
+
+        .btn-google {
+            background-color: white;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .btn-google:hover { background-color: #f5f5f5; }
+        .btn-google img { width: 20px; }
+
+        .auth-error {
+            color: var(--error-bg);
+            font-size: 0.85rem;
+            display: none;
+        }
+        .auth-close {
+            position: absolute;
+            top: 12px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="auth-modal-overlay">
+        <div class="auth-modal">
+            <button class="auth-close" id="auth-close">&times;</button>
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="signin">Sign In</div>
+                <div class="auth-tab" data-tab="signup">Sign Up</div>
+            </div>
+            
+            <div class="auth-body">
+                <!-- Sign In Form -->
+                <div class="auth-form active" id="form-signin">
+                    <input type="email" class="auth-input" id="signin-email" placeholder="Email Address">
+                    <input type="password" class="auth-input" id="signin-password" placeholder="Password">
+                    <div class="auth-error" id="signin-error"></div>
+                    <button class="btn-submit" id="btn-signin-submit">Sign In</button>
+                    <button class="btn-google" id="btn-signin-google">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                        Sign In with Google
+                    </button>
+                </div>
+                
+                <!-- Sign Up Form -->
+                <div class="auth-form" id="form-signup">
+                    <input type="text" class="auth-input" id="signup-username" placeholder="Username (Unique)">
+                    <input type="email" class="auth-input" id="signup-email" placeholder="Email Address">
+                    <input type="password" class="auth-input" id="signup-password" placeholder="Password (Min 8 chars, A-a-1-@)">
+                    <input type="password" class="auth-input" id="signup-confirm" placeholder="Confirm Password">
+                    <div class="auth-error" id="signup-error"></div>
+                    <button class="btn-submit" id="btn-signup-submit">Sign Up</button>
+                    <button class="btn-google" id="btn-signup-google">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                        Sign Up with Google
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Drawer -->
+    <div class="drawer-backdrop" id="drawer-backdrop"></div>
+    <div class="settings-drawer" id="settings-drawer">
+        <div class="settings-drawer-header">
+            <h2>⚙ Settings</h2>
+            <button class="settings-close" id="settings-close">&times;</button>
+        </div>
+
+        <!-- Skip Error Toggle -->
+        <div class="setting-row">
+            <div class="setting-info">
+                <label for="toggle-skip-error">Skip Error</label>
+                <p>When ON, mistakes turn red but cursor moves forward. When OFF, cursor locks on error (Strict Mode).</p>
+            </div>
+            <label class="toggle">
+                <input type="checkbox" id="toggle-skip-error">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <!-- Disable Backspace Toggle -->
+        <div class="setting-row">
+            <div class="setting-info">
+                <label for="toggle-no-backspace">Disable Backspace</label>
+                <p>When ON, the Backspace key will not work during a test. You must type forward only.</p>
+            </div>
+            <label class="toggle">
+                <input type="checkbox" id="toggle-no-backspace">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <!-- Dark Mode Toggle -->
+        <div class="setting-row">
+            <div class="setting-info">
+                <label for="toggle-dark">Dark Mode</label>
+                <p>Switch between Light and Dark themes.</p>
+            </div>
+            <label class="toggle">
+                <input type="checkbox" id="toggle-dark">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <nav class="top-nav">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">
+                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z"/></svg>
+                TypingTest
+            </a>
+            <div class="nav-links">
+                <!-- Test Type Dropdown -->
+                <div class="dropdown-wrapper">
+                    <div class="nav-link dropdown-toggle">Typing Test ▾</div>
+                    <div class="dropdown-menu" id="test-type-menu">
+                        <div class="nav-item" data-mode="time" data-val="60">1 Min Test</div>
+                        <div class="nav-item" data-mode="time" data-val="120">2 Min Test</div>
+                        <div class="nav-item" data-mode="time" data-val="300">5 Min Test</div>
+                        <div class="nav-item active" data-mode="page" data-val="1">1 Page Test</div>
+                        <div class="nav-item" data-mode="page" data-val="2">2 Page Test</div>
+                        <div class="nav-item" data-mode="page" data-val="3">3 Page Test</div>
+                    </div>
+                </div>
+                <div class="nav-link" id="nav-blogs" style="cursor: pointer;">📝 Blogs</div>
+                <div class="nav-link" id="nav-notif" style="cursor: pointer;">🔔 Notifications <span id="badge-notif">0</span></div>
+                <div class="nav-link" id="nav-history" style="cursor: pointer;">📈 History</div>
+                <div class="nav-link" id="nav-leaderboard" style="cursor: pointer;">🏆 Top Typers</div>
+
+                <div style="width: 1px; height: 30px; background: var(--border-color); margin: 0 10px;"></div>
+
+                <!-- Settings Gear Button -->
+                <button class="settings-btn" id="settings-btn" title="Settings">
+                    <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
+                </button>
+
+                <!-- User Auth & Avatar Container -->
+                <div class="auth-container">
+                    <button class="btn-auth" id="btn-auth-open">Sign In / Sign Up</button>
+                    
+                    <div id="user-avatar-container" style="display: none; position: relative;">
+                        <div id="user-avatar" class="avatar-btn">U</div>
+                        <div id="user-dropdown" class="avatar-dropdown">
+                            <div class="dropdown-item" id="menu-profile">👤 Profile</div>
+                            <div class="dropdown-item" id="menu-settings">⚙️ Settings</div>
+                            <div class="dropdown-item" id="menu-privacy">🔒 Privacy</div>
+                            <div class="dropdown-item" id="menu-logout">🚪 Logout</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        
+        <!-- Test View -->
+        <div id="test-view">
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-label">Speed</span>
+                    <span class="stat-value" id="live-wpm">0 WPM</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Accuracy</span>
+                    <span class="stat-value" id="live-acc">100%</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label" id="time-label">Time</span>
+                    <span class="stat-value" id="live-time">0:00</span>
+                </div>
+            </div>
+
+            <div class="typing-card" id="typing-card">
+                <div class="typing-text" id="text-display">
+                    <!-- Letters go here -->
+                </div>
+                
+                <div class="focus-overlay visible" id="focus-overlay">
+                    <button class="play-button">
+                        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                    <span class="focus-text">Click to start typing</span>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="btn-restart" id="btn-restart">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>
+                    </svg>
+                    Restart (Tab + Enter)
+                </button>
+            </div>
+        </div>
+
+        <!-- Blog View (Hidden by default) -->
+        <div id="blog-view" style="display: none; flex-direction: column; gap: 20px;">
+            <h2 style="color: var(--primary-blue);">Latest Blogs</h2>
+            <div id="blog-container">
+                <div style="text-align: center; color: var(--text-muted); padding: 50px;">Loading blogs...</div>
+            </div>
+        </div>
+
+        <!-- History View (Hidden by default) -->
+        <div id="history-view" style="display: none; flex-direction: column; gap: 20px;">
+            <h2 style="color: var(--primary-blue);">Your Typing History</h2>
+            <div style="background: var(--bg-content); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                <canvas id="historyChart" width="800" height="400"></canvas>
+            </div>
+            <div style="text-align: center; color: var(--text-muted); font-size: 0.9rem;" id="history-msg">
+                Showing your recent typing test progress.
+            </div>
+        </div>
+
+        <!-- Leaderboard View (Hidden by default) -->
+        <div id="leaderboard-view" style="display: none; flex-direction: column; gap: 20px;">
+            <h2 style="color: var(--primary-blue);">🏆 Top Typers</h2>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <input type="text" id="leaderboard-search" placeholder="Search by Username..." style="flex: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 1rem;">
+                <button id="btn-leaderboard-search" style="padding: 10px 20px; background: var(--primary-blue); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Search</button>
+            </div>
+            <div style="background: var(--bg-content); border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="background: var(--bg-body); border-bottom: 2px solid var(--border-color);">
+                            <th style="padding: 12px 15px;">Rank</th>
+                            <th style="padding: 12px 15px;">Username</th>
+                            <th style="padding: 12px 15px;">Best Speed (WPM)</th>
+                            <th style="padding: 12px 15px;">Accuracy</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                        <tr><td colspan="4" style="text-align: center; padding: 30px; color: var(--text-muted);">Loading Top Typers...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Notifications Dropdown (Hidden by default) -->
+        <div id="notif-dropdown" style="display: none; position: absolute; top: 60px; right: 20px; width: 300px; background: var(--bg-content); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 1000; padding: 10px; max-height: 400px; overflow-y: auto;">
+            <h3 style="margin: 0 0 10px 0; font-size: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">Notifications</h3>
+            <div id="notif-list">No new notifications.</div>
+        </div>
+
+        <!-- Results View -->
+        <div class="results-card" id="results-view">
+            <h2 class="results-title">Test Complete!</h2>
+            <div class="results-stats">
+                <div class="res-stat">
+                    <span class="res-val" id="res-wpm">0</span>
+                    <span class="res-lbl">WPM</span>
+                </div>
+                <div class="res-stat">
+                    <span class="res-val" id="res-acc">0%</span>
+                    <span class="res-lbl">Accuracy</span>
+                </div>
+                <div class="res-stat">
+                    <span class="res-val" id="res-time">0:00</span>
+                    <span class="res-lbl">Time</span>
+                </div>
+            </div>
+            <button class="btn-primary" id="btn-next">Next Test</button>
+        </div>
+
+        <input type="text" id="hidden-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+
+    </div>
+
+    <script>
+        // Diverse and unique typing texts
+        const SENTENCES = [
+            "Technology is constantly evolving, pushing the boundaries of what humanity can achieve. From the depths of the oceans to the far reaches of space, our thirst for knowledge remains unquenchable.",
+            "The ancient ruins stood as a silent testament to a civilization that once flourished along the fertile river valley, leaving behind intricate carvings and monumental architecture for modern scholars to decode.",
+            "A balanced diet and regular physical activity are foundational pillars of a healthy lifestyle. Cultivating mindfulness and managing stress effectively can further enhance one's overall well-being and longevity.",
+            "In the realm of quantum computing, traditional binary bits are replaced by qubits, allowing for complex calculations at unprecedented speeds. This paradigm shift could revolutionize cryptography and complex system modeling.",
+            "The delicate ecosystem of a coral reef supports thousands of marine species. Rising ocean temperatures and pollution pose severe threats to these vibrant underwater cities, urging global conservation efforts.",
+            "Writing a compelling story requires well-developed characters, a captivating plot, and a setting that breathes life into the narrative. Every sentence should propel the reader forward, hungry for the next chapter.",
+            "Artificial Intelligence has transitioned from science fiction to everyday reality. Machine learning algorithms now power recommendation engines, autonomous vehicles, and advanced medical diagnostic tools with remarkable accuracy.",
+            "Music transcends linguistic barriers, connecting people on a profound emotional level. Whether it's a grand symphony or a simple acoustic melody, the arrangement of notes can evoke memories and inspire action.",
+            "The financial markets operate as a complex web of supply, demand, and psychological sentiment. Investors analyze trends and economic indicators to make informed decisions in an ever-changing global economy.",
+            "Exploring the wilderness offers a temporary escape from the relentless pace of urban life. The rustling of leaves and the crisp mountain air provide a rejuvenating experience that reconnects us with nature."
+        ];
+
+        // Sound Effects
+        const audioTyping = new Audio('./typing_sound.mp3');
+        const audioError = new Audio('./typing_errorsound.mp3');
+
+        function playKeySound(isError) {
+            try {
+                if (isError) {
+                    audioError.currentTime = 0;
+                    audioError.play().catch(() => {});
+                } else {
+                    audioTyping.currentTime = 0;
+                    audioTyping.play().catch(() => {});
+                }
+            } catch (err) {}
+        }
+
+        let state = {
+            mode: 'page', // 'time' or 'page'
+            val: 1, // minutes or pages
+            text: "",
+            currentIndex: 0,
+            startTime: null,
+            timer: null,
+            isActive: false,
+            isFinished: false,
+            timeElapsed: 0,
+            totalTyped: 0,
+            errors: 0,
+            hasErrorAtCurrent: false, // Strict mode tracking
+            theme: 'light',
+            skipError: false, // Skip Error toggle
+            noBackspace: false // Disable Backspace toggle
+        };
+
+        const els = {
+            navLinks: document.querySelectorAll('.nav-link'),
+            textDisplay: document.getElementById('text-display'),
+            focusOverlay: document.getElementById('focus-overlay'),
+            hiddenInput: document.getElementById('hidden-input'),
+            typingCard: document.getElementById('typing-card'),
+            liveWpm: document.getElementById('live-wpm'),
+            liveAcc: document.getElementById('live-acc'),
+            liveTime: document.getElementById('live-time'),
+            timeLabel: document.getElementById('time-label'),
+            btnRestart: document.getElementById('btn-restart'),
+            testView: document.getElementById('test-view'),
+            resultsView: document.getElementById('results-view'),
+            resWpm: document.getElementById('res-wpm'),
+            resAcc: document.getElementById('res-acc'),
+            resTime: document.getElementById('res-time'),
+            btnNext: document.getElementById('btn-next'),
+            settingsBtn: document.getElementById('settings-btn'),
+            settingsDrawer: document.getElementById('settings-drawer'),
+            settingsClose: document.getElementById('settings-close'),
+            drawerBackdrop: document.getElementById('drawer-backdrop'),
+            toggleSkipError: document.getElementById('toggle-skip-error'),
+            toggleNoBackspace: document.getElementById('toggle-no-backspace'),
+            toggleDark: document.getElementById('toggle-dark')
+        };
+
+        function init() {
+            // Load Theme
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.dataset.theme = 'dark';
+                state.theme = 'dark';
+                els.toggleDark.checked = true;
+            }
+            // Load Skip Error
+            if (localStorage.getItem('skipError') === 'true') {
+                state.skipError = true;
+                els.toggleSkipError.checked = true;
+            }
+            // Load Disable Backspace
+            if (localStorage.getItem('noBackspace') === 'true') {
+                state.noBackspace = true;
+                els.toggleNoBackspace.checked = true;
+            }
+            bindEvents();
+            startTest();
+        }
+
+        function bindEvents() {
+            // Logo Click (Home)
+            document.querySelector('.nav-logo').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('test-view').style.display = 'block';
+                document.getElementById('blog-view').style.display = 'none';
+                document.getElementById('results-view').style.display = 'none';
+                document.getElementById('history-view').style.display = 'none';
+                document.getElementById('leaderboard-view').style.display = 'none';
+                startTest();
+            });
+
+            // Typing Test Nav Items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    navItems.forEach(l => l.classList.remove('active'));
+                    e.target.classList.add('active');
+                    state.mode = e.target.dataset.mode;
+                    state.val = parseInt(e.target.dataset.val);
+                    
+                    // Switch to test view if not already
+                    document.getElementById('test-view').style.display = 'block';
+                    document.getElementById('blog-view').style.display = 'none';
+                    document.getElementById('history-view').style.display = 'none';
+                    document.getElementById('leaderboard-view').style.display = 'none';
+                    document.getElementById('results-view').style.display = 'none';
+                    document.querySelector('.dropdown-toggle').textContent = `Typing Test: ${e.target.textContent} ▾`;
+                    
+                    startTest();
+                });
+            });
+
+            // Blogs Nav
+            document.getElementById('nav-blogs').addEventListener('click', () => {
+                document.getElementById('test-view').style.display = 'none';
+                document.getElementById('results-view').style.display = 'none';
+                document.getElementById('history-view').style.display = 'none';
+                document.getElementById('leaderboard-view').style.display = 'none';
+                document.getElementById('blog-view').style.display = 'flex';
+                loadBlogsFrontend();
+            });
+
+            // History Nav
+            document.getElementById('nav-history').addEventListener('click', () => {
+                document.getElementById('test-view').style.display = 'none';
+                document.getElementById('results-view').style.display = 'none';
+                document.getElementById('blog-view').style.display = 'none';
+                document.getElementById('leaderboard-view').style.display = 'none';
+                document.getElementById('history-view').style.display = 'flex';
+                loadHistoryFrontend();
+            });
+
+            // Leaderboard Nav
+            document.getElementById('nav-leaderboard').addEventListener('click', () => {
+                document.getElementById('test-view').style.display = 'none';
+                document.getElementById('results-view').style.display = 'none';
+                document.getElementById('blog-view').style.display = 'none';
+                document.getElementById('history-view').style.display = 'none';
+                document.getElementById('leaderboard-view').style.display = 'flex';
+                loadLeaderboardFrontend();
+            });
+
+            // Notifications Nav
+            const notifDropdown = document.getElementById('notif-dropdown');
+            document.getElementById('nav-notif').addEventListener('click', (e) => {
+                e.stopPropagation();
+                notifDropdown.style.display = notifDropdown.style.display === 'block' ? 'none' : 'block';
+            });
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#notif-dropdown') && e.target.id !== 'nav-notif') {
+                    notifDropdown.style.display = 'none';
+                }
+            });
+
+            els.focusOverlay.addEventListener('click', focusInput);
+            els.typingCard.addEventListener('click', focusInput);
+            
+            els.hiddenInput.addEventListener('blur', () => {
+                if (!state.isFinished) els.focusOverlay.classList.add('visible');
+                updateCaret(false);
+            });
+            
+            els.hiddenInput.addEventListener('focus', () => {
+                els.focusOverlay.classList.remove('visible');
+                updateCaret(true);
+            });
+
+            document.addEventListener('keydown', handleGlobalKeydown);
+            els.btnRestart.addEventListener('click', startTest);
+            els.btnNext.addEventListener('click', startTest);
+
+            // Settings Drawer
+            els.settingsBtn.addEventListener('click', () => {
+                els.settingsDrawer.classList.add('open');
+                els.drawerBackdrop.classList.add('visible');
+            });
+            const closeDrawer = () => {
+                els.settingsDrawer.classList.remove('open');
+                els.drawerBackdrop.classList.remove('visible');
+            };
+            els.settingsClose.addEventListener('click', closeDrawer);
+            els.drawerBackdrop.addEventListener('click', closeDrawer);
+
+            // Skip Error Toggle
+            els.toggleSkipError.addEventListener('change', () => {
+                state.skipError = els.toggleSkipError.checked;
+                localStorage.setItem('skipError', state.skipError);
+                if (state.skipError) state.hasErrorAtCurrent = false;
+            });
+
+            // Disable Backspace Toggle
+            els.toggleNoBackspace.addEventListener('change', () => {
+                state.noBackspace = els.toggleNoBackspace.checked;
+                localStorage.setItem('noBackspace', state.noBackspace);
+            });
+
+            // Dark Mode Toggle
+            els.toggleDark.addEventListener('change', () => {
+                if (els.toggleDark.checked) {
+                    document.body.dataset.theme = 'dark';
+                    state.theme = 'dark';
+                } else {
+                    document.body.removeAttribute('data-theme');
+                    state.theme = 'light';
+                }
+                localStorage.setItem('theme', state.theme);
+            });
+        }
+
+        function focusInput() {
+            els.hiddenInput.focus();
+        }
+
+        function generateText() {
+            let numSentences = 0;
+            if (state.mode === 'page') {
+                // ~15 sentences per page (roughly 150 words)
+                numSentences = state.val * 15;
+            } else {
+                // Time mode, generate plenty of text (e.g. 5 min * 30 sentences = 150 sentences)
+                numSentences = (state.val / 60) * 35;
+            }
+
+            let text = "";
+            for (let i = 0; i < numSentences; i++) {
+                text += SENTENCES[Math.floor(Math.random() * SENTENCES.length)] + (i < numSentences - 1 ? " " : "");
+            }
+            return text;
+        }
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            return `${m}:${s.toString().padStart(2, '0')}`;
+        }
+
+        function startTest() {
+            clearInterval(state.timer);
+            
+            state.text = generateText();
+            state.currentIndex = 0;
+            state.isActive = false;
+            state.isFinished = false;
+            state.startTime = null;
+            state.timeElapsed = 0;
+            state.totalTyped = 0;
+            state.errors = 0;
+            state.hasErrorAtCurrent = false;
+
+            els.testView.style.display = 'block';
+            els.resultsView.style.display = 'none';
+
+            if (state.mode === 'time') {
+                els.timeLabel.textContent = "Time Left";
+                els.liveTime.textContent = formatTime(state.val);
+            } else {
+                els.timeLabel.textContent = "Time";
+                els.liveTime.textContent = "0:00";
+            }
+            
+            els.liveWpm.textContent = "0 WPM";
+            els.liveAcc.textContent = "100%";
+            els.textDisplay.style.transform = `translateY(0px)`; // Reset scroll
+
+            renderText();
+            els.hiddenInput.value = '';
+            
+            // Re-focus if we were focused
+            if (document.activeElement !== els.hiddenInput) {
+                els.focusOverlay.classList.add('visible');
+            } else {
+                updateCaret(true);
+            }
+        }
+
+        function renderText() {
+            els.textDisplay.innerHTML = '';
+            for (let i = 0; i < state.text.length; i++) {
+                const span = document.createElement('span');
+                span.className = 'letter';
+                span.textContent = state.text[i];
+                els.textDisplay.appendChild(span);
+            }
+        }
+
+        function updateCaret(isFocused) {
+            // Remove old caret
+            const oldCaret = els.textDisplay.querySelector('.active-caret');
+            if (oldCaret) oldCaret.classList.remove('active-caret');
+
+            if (state.isFinished || !isFocused) return;
+
+            if (state.currentIndex < els.textDisplay.children.length) {
+                const target = els.textDisplay.children[state.currentIndex];
+                target.classList.add('active-caret');
+                
+                // AUTOMATIC SMOOTH SCROLLING
+                // Determine the vertical position of the current letter
+                const targetTop = target.offsetTop;
+                
+                // If the cursor goes down to a new line, shift the entire text block up smoothly.
+                // We keep the first line at top=0. Subsequent lines move up.
+                // Depending on font-size (2rem) and line-height (1.8), line height is ~50-60px.
+                // Let's scroll up so the active line is always visible near the top.
+                if (targetTop > 10) {
+                    els.textDisplay.style.transform = `translateY(-${targetTop}px)`;
+                } else {
+                    els.textDisplay.style.transform = `translateY(0px)`;
+                }
+            }
+        }
+
+        function handleGlobalKeydown(e) {
+            // Do not intercept keys if user is typing in an input field (EXCEPT our hidden typing input)
+            if (document.activeElement && 
+                document.activeElement !== els.hiddenInput && 
+                (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
+                return;
+            }
+
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                startTest();
+                return;
+            }
+            if (e.key === 'Enter' && state.isFinished) {
+                startTest();
+                return;
+            }
+
+            if (!document.activeElement || document.activeElement !== els.hiddenInput) {
+                // If it's a typing key and no other input is focused, focus the hidden input
+                if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
+                    focusInput();
+                } else {
+                    return;
+                }
+            }
+
+            if (state.isFinished) return;
+
+            // Start test
+            if (!state.isActive && (e.key.length === 1 || e.key === 'Backspace')) {
+                state.isActive = true;
+                state.startTime = Date.now();
+                startTimer();
+            }
+
+            els.typingCard.classList.add('typing');
+            clearTimeout(state.typeTimeout);
+            state.typeTimeout = setTimeout(() => els.typingCard.classList.remove('typing'), 500);
+
+            // Handle Backspace
+            if (e.key === 'Backspace') {
+                // If Disable Backspace is ON, ignore it completely
+                if (state.noBackspace) return;
+
+                playKeySound(false); // Backspace sound
+
+                if (state.hasErrorAtCurrent) {
+                    // Remove error on current
+                    const span = els.textDisplay.children[state.currentIndex];
+                    span.classList.remove('incorrect');
+                    state.hasErrorAtCurrent = false;
+                } else if (state.currentIndex > 0) {
+                    // Go back one
+                    state.currentIndex--;
+                    const span = els.textDisplay.children[state.currentIndex];
+                    span.classList.remove('correct', 'incorrect');
+                    state.hasErrorAtCurrent = false;
+                }
+                updateCaret(true);
+                return;
+            }
+
+            // Normal typing
+            if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
+                if (state.currentIndex < state.text.length) {
+                    const expectedChar = state.text[state.currentIndex];
+                    const span = els.textDisplay.children[state.currentIndex];
+
+                    if (state.skipError) {
+                        // ===== SKIP ERROR MODE =====
+                        // Always advance cursor — just colour correct/incorrect
+                        if (e.key === expectedChar) {
+                            playKeySound(false);
+                            span.classList.remove('incorrect');
+                            span.classList.add('correct');
+                            state.totalTyped++;
+                        } else {
+                            playKeySound(true);
+                            span.classList.add('incorrect');
+                            state.errors++;
+                        }
+                        state.currentIndex++;
+                        state.hasErrorAtCurrent = false;
+
+                    } else {
+                        // ===== STRICT MODE =====
+                        if (state.hasErrorAtCurrent) {
+                            // Must type correct key or backspace to continue
+                            if (e.key === expectedChar) {
+                                playKeySound(false);
+                                span.classList.remove('incorrect');
+                                span.classList.add('correct');
+                                state.hasErrorAtCurrent = false;
+                                state.currentIndex++;
+                                state.totalTyped++;
+                            } else {
+                                playKeySound(true); // Locked error
+                                return; // Cursor stays locked
+                            }
+                        } else {
+                            if (e.key === expectedChar) {
+                                playKeySound(false);
+                                span.classList.add('correct');
+                                state.currentIndex++;
+                                state.totalTyped++;
+                            } else {
+                                playKeySound(true);
+                                span.classList.add('incorrect');
+                                state.errors++;
+                                state.hasErrorAtCurrent = true;
+                                // Do NOT advance cursor
+                            }
+                        }
+                    }
+                }
+                
+                updateCaret(true);
+                updateStats();
+
+                // Check completion
+                if (state.currentIndex >= state.text.length) {
+                    finishTest();
+                }
+            }
+        }
+
+        function updateStats() {
+            if (!state.isActive) return;
+            const minutesElapsed = (Date.now() - state.startTime) / 60000;
+            const wpm = minutesElapsed > 0 ? Math.round((state.totalTyped / 5) / minutesElapsed) : 0;
+            const acc = state.totalTyped > 0 ? Math.round(((state.totalTyped) / (state.totalTyped + state.errors)) * 100) : 100;
+
+            els.liveWpm.textContent = `${wpm} WPM`;
+            els.liveAcc.textContent = `${acc}%`;
+        }
+
+        function startTimer() {
+            state.timer = setInterval(() => {
+                const secondsElapsed = Math.floor((Date.now() - state.startTime) / 1000);
+                state.timeElapsed = secondsElapsed;
+
+                if (state.mode === 'time') {
+                    const timeLeft = state.val - secondsElapsed;
+                    els.liveTime.textContent = formatTime(timeLeft);
+                    if (timeLeft <= 0) {
+                        finishTest();
+                    }
+                } else {
+                    els.liveTime.textContent = formatTime(secondsElapsed);
+                }
+                updateStats();
+            }, 1000);
+        }
+
+        function finishTest() {
+            clearInterval(state.timer);
+            state.isActive = false;
+            state.isFinished = true;
+            els.hiddenInput.blur();
+
+            const minutesElapsed = state.timeElapsed / 60;
+            const wpm = minutesElapsed > 0 ? Math.round((state.totalTyped / 5) / minutesElapsed) : 0;
+            const acc = state.totalTyped > 0 ? Math.round(((state.totalTyped) / (state.totalTyped + state.errors)) * 100) : 100;
+
+            els.testView.style.display = 'none';
+            els.resultsView.style.display = 'flex';
+
+            els.resWpm.textContent = wpm;
+            els.resAcc.textContent = `${acc}%`;
+            els.resTime.textContent = formatTime(state.timeElapsed);
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+
+    <!-- ======== FIREBASE SDK & AUTH LOGIC ======== -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+        import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js";
+        import { 
+            getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
+            signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut 
+        } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+        import { 
+            getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc, arrayUnion, addDoc, orderBy, limit 
+        } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCegeB9vk5Ia6rF1Rk0Ss_AOxHYq9YU5VI",
+            authDomain: "typing-website-8b017.firebaseapp.com",
+            projectId: "typing-website-8b017",
+            storageBucket: "typing-website-8b017.firebasestorage.app",
+            messagingSenderId: "160410564570",
+            appId: "1:160410564570:web:abed03ab930a0a9d76b2e3",
+            measurementId: "G-VK1V994W50"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        // Analytics Observer
+        const resultsObserver = new MutationObserver(() => {
+            const resultsView = document.getElementById('results-view');
+            if (resultsView && resultsView.style.display === 'flex') {
+                const wpm = document.getElementById('res-wpm')?.textContent || '0';
+                const acc = document.getElementById('res-acc')?.textContent || '0%';
+                const time = document.getElementById('res-time')?.textContent || '0:00';
+                logEvent(analytics, 'test_complete', { wpm: parseInt(wpm), accuracy: acc, duration: time });
+                saveTestHistory(parseInt(wpm), parseFloat(acc), time);
+            }
+        });
+        resultsObserver.observe(document.getElementById('results-view'), { attributes: true, attributeFilter: ['style'] });
+
+        // UI Elements
+        const btnAuthOpen = document.getElementById('btn-auth-open');
+        const userAvatarContainer = document.getElementById('user-avatar-container');
+        const userAvatar = document.getElementById('user-avatar');
+        const userDropdown = document.getElementById('user-dropdown');
+        const authModalOverlay = document.getElementById('auth-modal-overlay');
+        const authClose = document.getElementById('auth-close');
+        const authTabs = document.querySelectorAll('.auth-tab');
+        const formSignin = document.getElementById('form-signin');
+        const formSignup = document.getElementById('form-signup');
+        
+        // Menu Elements
+        document.getElementById('menu-settings').addEventListener('click', () => {
+            userDropdown.classList.remove('show');
+            document.getElementById('settings-drawer').classList.add('open');
+            document.getElementById('drawer-backdrop').classList.add('visible');
+        });
+        
+        document.getElementById('menu-logout').addEventListener('click', () => signOut(auth));
+
+        // Toggle Dropdown
+        userAvatar.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userDropdown.classList.toggle('show');
+        });
+        document.addEventListener('click', () => userDropdown.classList.remove('show'));
+
+        // Auth Modal Toggles
+        btnAuthOpen.addEventListener('click', () => authModalOverlay.classList.add('show'));
+        authClose.addEventListener('click', () => authModalOverlay.classList.remove('show'));
+        
+        authTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                authTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                if (tab.dataset.tab === 'signin') {
+                    formSignin.classList.add('active');
+                    formSignup.classList.remove('active');
+                } else {
+                    formSignin.classList.remove('active');
+                    formSignup.classList.add('active');
+                }
+            });
+        });
+
+        // Global variable for current user
+        let currentUser = null;
+        let viewedBlogs = [];
+
+        // Auth State Listener
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                btnAuthOpen.style.display = 'none';
+                userAvatarContainer.style.display = 'block';
+                authModalOverlay.classList.remove('show');
+                
+                // Get initial for avatar
+                let initial = user.email ? user.email.charAt(0).toUpperCase() : 'U';
+                
+                // Try fetching username from firestore
+                try {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists()) {
+                        if (userDoc.data().username) initial = userDoc.data().username.charAt(0).toUpperCase();
+                        if (userDoc.data().viewedBlogs) viewedBlogs = userDoc.data().viewedBlogs;
+                    }
+                } catch(e) {}
+                
+                userAvatar.textContent = initial;
+
+                // Fetch Notifications
+                try {
+                    const qNotif = query(collection(db, "notifications"), where("userId", "==", user.uid));
+                    const notifSnap = await getDocs(qNotif);
+                    let notifHtml = '';
+                    let notifCount = 0;
+                    
+                    notifSnap.forEach(docSnap => {
+                        const data = docSnap.data();
+                        const notifDate = new Date(data.createdAt);
+                        const diffTime = Math.abs(new Date() - notifDate);
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                        
+                        // Show only if less than 2 days old (simulates auto-delete)
+                        if (diffDays <= 2) {
+                            let imgTag = data.image ? `<img src="${data.image}" style="max-width:100%; border-radius:4px; margin-top:5px; margin-bottom:5px;">` : '';
+                            notifHtml += `<div class="notif-item">
+                                ${imgTag}
+                                <div>${data.message}</div>
+                                <small style="color:var(--text-muted)">${notifDate.toLocaleDateString()}</small>
+                            </div>`;
+                            notifCount++;
+                            showNotificationToast(data.message); // still show toast once
+                        }
+                    });
+
+                    if (notifCount > 0) {
+                        document.getElementById('notif-list').innerHTML = notifHtml;
+                        const badge = document.getElementById('badge-notif');
+                        badge.textContent = notifCount;
+                        badge.style.display = 'inline-block';
+                    }
+                } catch (e) {
+                    console.error("Error fetching notifications:", e);
+                }
+
+                // If currently on blog view, reload blogs
+                if (document.getElementById('blog-view').style.display !== 'none') {
+                    loadBlogsFrontend();
+                }
+            } else {
+                currentUser = null;
+                viewedBlogs = [];
+                btnAuthOpen.style.display = 'block';
+                userAvatarContainer.style.display = 'none';
+                document.getElementById('notif-list').innerHTML = 'No new notifications.';
+                document.getElementById('badge-notif').style.display = 'none';
+            }
+        });
+
+        // Load Blogs into Frontend
+        window.loadBlogsFrontend = async function() {
+            const container = document.getElementById('blog-container');
+            container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 50px;">Loading blogs...</div>';
+
+            try {
+                const snapshot = await getDocs(collection(db, "blogs"));
+                let blogsHtml = '';
+                let count = 0;
+
+                snapshot.forEach(docItem => {
+                    if (viewedBlogs.includes(docItem.id)) return;
+
+                    const data = docItem.data();
+                    const date = new Date(data.createdAt).toLocaleDateString();
+                    count++;
+
+                    blogsHtml += `
+                        <div class="blog-card" id="blog-${docItem.id}">
+                            ${data.image ? `<img src="${data.image}" alt="Blog Image" style="max-width: 100%; border-radius: 8px; margin-bottom: 15px;">` : ''}
+                            <h3 class="blog-title">${data.title}</h3>
+                            <div class="blog-meta">Posted on ${date}</div>
+                            <div class="blog-content">${data.content}</div>
+                            ${currentUser ? `<button class="btn-mark-read" onclick="markBlogAsViewed('${docItem.id}')">Mark as Read (Remove)</button>` : ''}
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = count === 0 ? '<div style="text-align: center; color: var(--text-muted); padding: 50px;">No new blogs available!</div>' : blogsHtml;
+            } catch (err) {
+                container.innerHTML = `<div style="text-align: center; color: red; padding: 50px;">Error: ${err.message}</div>`;
+            }
+        };
+
+        window.markBlogAsViewed = async function(blogId) {
+            if (!currentUser) return alert("Please log in first!");
+            try {
+                const userRef = doc(db, "users", currentUser.uid);
+                await updateDoc(userRef, { viewedBlogs: arrayUnion(blogId) });
+                document.getElementById(`blog-${blogId}`).remove();
+                viewedBlogs.push(blogId);
+                
+                if (document.querySelectorAll('#blog-container .blog-card').length === 0) {
+                    document.getElementById('blog-container').innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 50px;">No new blogs available!</div>';
+                }
+            } catch (err) {
+                console.error("Error marking blog as read:", err);
+            }
+        };
+
+        // Notification Toast UI Helper
+        function showNotificationToast(msg) {
+            const toast = document.createElement('div');
+            toast.style.position = 'fixed';
+            toast.style.bottom = '20px';
+            toast.style.right = '20px';
+            toast.style.background = '#333';
+            toast.style.color = 'white';
+            toast.style.padding = '15px 20px';
+            toast.style.borderRadius = '8px';
+            toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+            toast.style.zIndex = '9999';
+            toast.style.maxWidth = '300px';
+            toast.style.animation = 'slideIn 0.3s forwards';
+            toast.innerHTML = `<strong>🔔 Notification</strong><br><span style="font-size:0.9rem">${msg}</span>`;
+            document.body.appendChild(toast);
+            
+            // Auto hide toast after 10s
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.5s';
+                setTimeout(() => toast.remove(), 500);
+            }, 10000);
+        }
+
+        // Password Validation
+        function isValidPassword(pwd) {
+            const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+            return regex.test(pwd);
+        }
+
+        async function isUsernameUnique(username) {
+            const q = query(collection(db, "users"), where("username", "==", username));
+            const querySnapshot = await getDocs(q);
+            return querySnapshot.empty;
+        }
+
+        // Error display helpers
+        function showSigninError(msg) {
+            const el = document.getElementById('signin-error');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+        function showSignupError(msg) {
+            const el = document.getElementById('signup-error');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+
+        // Email Sign Up
+        document.getElementById('btn-signup-submit').addEventListener('click', async () => {
+            const username = document.getElementById('signup-username').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const pwd = document.getElementById('signup-password').value;
+            const confirm = document.getElementById('signup-confirm').value;
+
+            if (!username || !email || !pwd) return showSignupError("All fields are required.");
+            if (pwd !== confirm) return showSignupError("Passwords do not match.");
+            if (!isValidPassword(pwd)) return showSignupError("Password must be 8+ chars with uppercase, lowercase, number, and special character.");
+
+            try {
+                const unique = await isUsernameUnique(username);
+                if (!unique) return showSignupError("Username is already taken.");
+
+                const userCred = await createUserWithEmailAndPassword(auth, email, pwd);
+                await setDoc(doc(db, "users", userCred.user.uid), {
+                    username: username,
+                    email: email,
+                    createdAt: new Date()
+                });
+            } catch (error) {
+                showSignupError(error.message);
+            }
+        });
+
+        // Email Sign In
+        document.getElementById('btn-signin-submit').addEventListener('click', async () => {
+            const email = document.getElementById('signin-email').value.trim();
+            const pwd = document.getElementById('signin-password').value;
+            if (!email || !pwd) return showSigninError("Email and password required.");
+            try {
+                await signInWithEmailAndPassword(auth, email, pwd);
+            } catch (error) {
+                showSigninError(error.message);
+            }
+        });
+
+        // Google Auth
+        const handleGoogleAuth = async (errorElementId) => {
+            try {
+                const result = await signInWithPopup(auth, googleProvider);
+                const user = result.user;
+                // Ensure user doc exists
+                const userDocRef = doc(db, "users", user.uid);
+                const userDoc = await getDoc(userDocRef);
+                if (!userDoc.exists()) {
+                    await setDoc(userDocRef, {
+                        username: user.displayName || user.email.split('@')[0],
+                        email: user.email,
+                        createdAt: new Date()
+                    });
+                }
+            } catch (error) {
+                document.getElementById(errorElementId).textContent = error.message;
+                document.getElementById(errorElementId).style.display = 'block';
+            }
+        };
+
+        // Leaderboard Search
+        document.getElementById('btn-leaderboard-search').addEventListener('click', () => {
+            loadLeaderboardFrontend(document.getElementById('leaderboard-search').value.trim());
+        });
+
+        // Save Test History
+        window.saveTestHistory = async function(wpm, acc, time) {
+            const historyItem = { wpm, acc, time, date: new Date().toISOString() };
+            if (currentUser) {
+                try {
+                    // Save to subcollection
+                    await addDoc(collection(db, "users", currentUser.uid, "history"), historyItem);
+                    // Update Best WPM/Acc
+                    const userRef = doc(db, "users", currentUser.uid);
+                    const userDoc = await getDoc(userRef);
+                    if (userDoc.exists()) {
+                        const data = userDoc.data();
+                        const currentBest = data.bestWpm || 0;
+                        if (wpm > currentBest) {
+                            await updateDoc(userRef, { bestWpm: wpm, bestAcc: acc });
+                        }
+                    }
+                } catch (e) { console.error("Error saving history:", e); }
+            } else {
+                let guestHist = JSON.parse(localStorage.getItem('guestHistory') || '[]');
+                guestHist.push(historyItem);
+                localStorage.setItem('guestHistory', JSON.stringify(guestHist));
+            }
+        };
+
+        // Load History Chart
+        let historyChartInstance = null;
+        window.loadHistoryFrontend = async function() {
+            let historyData = [];
+            if (currentUser) {
+                try {
+                    const q = query(collection(db, "users", currentUser.uid, "history"), orderBy("date", "asc"));
+                    const snap = await getDocs(q);
+                    snap.forEach(d => historyData.push(d.data()));
+                } catch (e) { console.error("Error loading history:", e); }
+            } else {
+                historyData = JSON.parse(localStorage.getItem('guestHistory') || '[]');
+            }
+
+            const ctx = document.getElementById('historyChart').getContext('2d');
+            if (historyChartInstance) historyChartInstance.destroy();
+
+            if (historyData.length === 0) {
+                document.getElementById('history-msg').textContent = "No history found. Complete a test to see your progress!";
+                return;
+            } else {
+                document.getElementById('history-msg').textContent = "Showing your recent typing test progress.";
+            }
+
+            const labels = historyData.map((d, i) => `Test ${i + 1}`);
+            const wpmData = historyData.map(d => d.wpm);
+            const accData = historyData.map(d => parseFloat(d.acc));
+
+            historyChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Speed (WPM)',
+                            data: wpmData,
+                            borderColor: '#0073e6',
+                            backgroundColor: 'rgba(0, 115, 230, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Accuracy (%)',
+                            data: accData,
+                            borderColor: '#22c55e',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.3,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        y: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'WPM' }, min: 0 },
+                        y1: { type: 'linear', display: true, position: 'right', title: { display: true, text: 'Accuracy %' }, min: 0, max: 100, grid: { drawOnChartArea: false } }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                afterBody: function(context) {
+                                    const index = context[0].dataIndex;
+                                    return `Time: ${historyData[index].time}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        };
+
+        // Load Leaderboard
+        window.loadLeaderboardFrontend = async function(searchQuery = "") {
+            const tbody = document.getElementById('leaderboard-body');
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 30px; color: var(--text-muted);">Loading Top Typers...</td></tr>';
+            try {
+                // Fetch top 50 users based on bestWpm
+                const q = query(collection(db, "users"), orderBy("bestWpm", "desc"), limit(50));
+                const snap = await getDocs(q);
+                
+                let html = "";
+                let rank = 1;
+                snap.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (!data.bestWpm) return; // Skip if no bestWpm
+
+                    const uname = data.username || "Anonymous";
+                    if (searchQuery && !uname.toLowerCase().includes(searchQuery.toLowerCase())) return;
+
+                    html += `
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 12px 15px;">#${rank}</td>
+                            <td style="padding: 12px 15px; font-weight: bold;">${uname}</td>
+                            <td style="padding: 12px 15px; color: var(--primary-blue); font-weight: bold;">${data.bestWpm} WPM</td>
+                            <td style="padding: 12px 15px;">${data.bestAcc}%</td>
+                        </tr>
+                    `;
+                    rank++;
+                });
+
+                if (html === "") {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 30px; color: var(--text-muted);">No records found.</td></tr>';
+                } else {
+                    tbody.innerHTML = html;
+                }
+            } catch (e) {
+                console.error("Error loading leaderboard:", e);
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 30px; color: var(--error-bg);">Failed to load leaderboard.</td></tr>`;
+            }
+        };
+
+        document.getElementById('btn-signin-google').addEventListener('click', () => handleGoogleAuth('signin-error'));
+        document.getElementById('btn-signup-google').addEventListener('click', () => handleGoogleAuth('signup-error'));
+    </script>
+</body>
+</html>
