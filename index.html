@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -379,17 +378,25 @@
         }
 
         .typing-text {
-            font-size: 2rem; /* Increased font size */
-            line-height: 1.8;
-            color: var(--text-upcoming);
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 2.2rem; /* Increased size as requested */
+            font-weight: bold;
+            letter-spacing: 2px;
+            line-height: 2em;
+            color: var(--text-main);
+            background: linear-gradient(transparent calc(100% - 1px), var(--border-color) calc(100% - 1px));
+            background-size: 100% 2em;
             position: relative;
             outline: none;
             user-select: none;
             transition: transform 0.2s ease-out; /* Smooth scrolling */
+            white-space: pre-wrap; /* Crucial for preserving spaces between words */
+            word-break: normal;
         }
 
         .letter {
             position: relative;
+            /* Removed display: inline-block; this was causing the glitchy mid-word breaking and missing spaces! */
         }
 
         .letter.correct {
@@ -397,35 +404,23 @@
         }
 
         .letter.incorrect {
-            background-color: var(--error-bg);
-            color: var(--error-color);
-            border-radius: 4px;
+            color: var(--error-bg);
+            border-bottom: 2px solid var(--error-bg);
         }
 
         /* Typing.com style Cursor (Underline) */
-        .caret {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background-color: var(--caret-color);
-            z-index: 10;
-        }
-
         .letter.active-caret {
-            position: relative;
+            color: var(--primary-blue);
         }
         
         .letter.active-caret::after {
             content: '';
             position: absolute;
-            bottom: -2px;
+            bottom: 2px;
             left: 0;
             width: 100%;
-            height: 5px;
-            background-color: var(--caret-color);
-            border-radius: 2px;
+            height: 3px;
+            background-color: var(--primary-blue);
             animation: blink 1s infinite;
         }
 
@@ -755,6 +750,39 @@
             color: var(--text-muted);
             cursor: pointer;
         }
+        /* Responsive Layout for Mobile/Tablet */
+        @media (max-width: 800px) {
+            .nav-container {
+                flex-direction: column;
+                height: auto;
+                padding: 10px 0;
+                gap: 15px;
+            }
+            .nav-links {
+                justify-content: center;
+                gap: 10px;
+            }
+            .main-container {
+                padding: 10px;
+                margin-top: 10px;
+            }
+            .stats-bar {
+                flex-wrap: wrap;
+                gap: 10px;
+                justify-content: center;
+            }
+            .typing-card {
+                padding: 20px;
+                height: 300px;
+            }
+            .typing-text {
+                font-size: 1.2rem;
+            }
+            .auth-modal {
+                width: 95%;
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -804,6 +832,19 @@
         <div class="settings-drawer-header">
             <h2>⚙ Settings</h2>
             <button class="settings-close" id="settings-close">&times;</button>
+        </div>
+
+        <!-- Edit Profile Name (Hidden if not logged in) -->
+        <div class="setting-row" id="setting-edit-name" style="display: none; flex-direction: column; gap: 8px;">
+            <div class="setting-info" style="padding-right: 0;">
+                <label>Edit Display Name</label>
+                <p>Update your name. This will immediately reflect on the Top Typers leaderboard!</p>
+            </div>
+            <div style="display: flex; gap: 10px; width: 100%;">
+                <input type="text" id="edit-username-input" class="auth-input" style="margin-bottom: 0; flex: 1;" placeholder="New Username">
+                <button id="btn-save-username" class="btn-primary" style="padding: 0 15px; font-size: 0.9rem;">Save</button>
+            </div>
+            <div id="edit-username-msg" style="font-size: 0.85rem; margin-top: 5px;"></div>
         </div>
 
         <!-- Skip Error Toggle -->
@@ -1029,11 +1070,11 @@
         function playKeySound(isError) {
             try {
                 if (isError) {
-                    audioError.currentTime = 0;
-                    audioError.play().catch(() => {});
+                    const clone = audioError.cloneNode(true);
+                    clone.play().catch(() => {});
                 } else {
-                    audioTyping.currentTime = 0;
-                    audioTyping.play().catch(() => {});
+                    const clone = audioTyping.cloneNode(true);
+                    clone.play().catch(() => {});
                 }
             } catch (err) {}
         }
@@ -1240,11 +1281,11 @@
         function generateText() {
             let numSentences = 0;
             if (state.mode === 'page') {
-                // ~15 sentences per page (roughly 150 words)
-                numSentences = state.val * 15;
+                // ~3 to 4 paragraphs per page (roughly 120-150 words)
+                numSentences = state.val * 4;
             } else {
-                // Time mode, generate plenty of text (e.g. 5 min * 30 sentences = 150 sentences)
-                numSentences = (state.val / 60) * 35;
+                // Time mode, generate plenty of text so it never runs out during the timer
+                numSentences = (state.val / 60) * 20;
             }
 
             let text = "";
@@ -1323,13 +1364,12 @@
                 // AUTOMATIC SMOOTH SCROLLING
                 // Determine the vertical position of the current letter
                 const targetTop = target.offsetTop;
+                const lineHeight = target.offsetHeight || 50; // Dynamic line height based on font size
                 
-                // If the cursor goes down to a new line, shift the entire text block up smoothly.
-                // We keep the first line at top=0. Subsequent lines move up.
-                // Depending on font-size (2rem) and line-height (1.8), line height is ~50-60px.
-                // Let's scroll up so the active line is always visible near the top.
-                if (targetTop > 10) {
-                    els.textDisplay.style.transform = `translateY(-${targetTop}px)`;
+                // Keep the active line visible, preferably as the second line so the user has context above
+                if (targetTop > lineHeight * 1.5) {
+                    // Scroll up so the active line is always the second visible line
+                    els.textDisplay.style.transform = `translateY(-${targetTop - lineHeight}px)`;
                 } else {
                     els.textDisplay.style.transform = `translateY(0px)`;
                 }
@@ -1617,12 +1657,22 @@
                 try {
                     const userDoc = await getDoc(doc(db, "users", user.uid));
                     if (userDoc.exists()) {
-                        if (userDoc.data().username) initial = userDoc.data().username.charAt(0).toUpperCase();
-                        if (userDoc.data().viewedBlogs) viewedBlogs = userDoc.data().viewedBlogs;
+                        const data = userDoc.data();
+                        if (data.username) {
+                            initial = data.username.charAt(0).toUpperCase();
+                            document.getElementById('edit-username-input').value = data.username;
+                        }
+                        if (data.viewedBlogs) viewedBlogs = data.viewedBlogs;
                     }
                 } catch(e) {}
                 
                 userAvatar.textContent = initial;
+                document.getElementById('setting-edit-name').style.display = 'flex';
+
+                // Profile menu opens settings
+                document.getElementById('menu-profile').onclick = () => {
+                    document.getElementById('settings-btn').click();
+                };
 
                 // Fetch Notifications
                 try {
@@ -1671,6 +1721,42 @@
                 userAvatarContainer.style.display = 'none';
                 document.getElementById('notif-list').innerHTML = 'No new notifications.';
                 document.getElementById('badge-notif').style.display = 'none';
+                document.getElementById('setting-edit-name').style.display = 'none';
+            }
+        });
+
+        // Save Username Logic
+        document.getElementById('btn-save-username').addEventListener('click', async () => {
+            if (!currentUser) return;
+            const newName = document.getElementById('edit-username-input').value.trim();
+            const msgEl = document.getElementById('edit-username-msg');
+            if (!newName) {
+                msgEl.textContent = "Name cannot be empty.";
+                msgEl.style.color = "var(--error-bg)";
+                return;
+            }
+            try {
+                // Optional: Check if unique if required, but for display name it might not strictly need uniqueness.
+                // However, user requested uniqueness during sign-up, so let's verify if changed.
+                const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+                if (userDoc.exists() && userDoc.data().username === newName) {
+                    msgEl.textContent = "Username is already this value.";
+                    msgEl.style.color = "var(--text-muted)";
+                    return;
+                }
+                const isUnique = await isUsernameUnique(newName);
+                if (!isUnique) {
+                    msgEl.textContent = "Username already taken. Choose another.";
+                    msgEl.style.color = "var(--error-bg)";
+                    return;
+                }
+                await updateDoc(doc(db, "users", currentUser.uid), { username: newName });
+                msgEl.textContent = "Name updated successfully!";
+                msgEl.style.color = "var(--text-correct)";
+                document.getElementById('user-avatar').textContent = newName.charAt(0).toUpperCase();
+            } catch(e) {
+                msgEl.textContent = "Error updating name.";
+                msgEl.style.color = "var(--error-bg)";
             }
         });
 
@@ -1929,7 +2015,9 @@
                             callbacks: {
                                 afterBody: function(context) {
                                     const index = context[0].dataIndex;
-                                    return `Time: ${historyData[index].time}`;
+                                    const dataItem = historyData[index];
+                                    const dateStr = new Date(dataItem.date).toLocaleDateString();
+                                    return `Date: ${dateStr}\nDuration: ${dataItem.time}`;
                                 }
                             }
                         }
@@ -1938,7 +2026,7 @@
             });
         };
 
-        // Load Leaderboard()
+        // Load Leaderboard
         window.loadLeaderboardFrontend = async function(searchQuery = "") {
             const tbody = document.getElementById('leaderboard-body');
             tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 30px; color: var(--text-muted);">Loading Top Typers...</td></tr>';
