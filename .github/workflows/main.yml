@@ -1,0 +1,26 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main  # अगर आपकी ब्रांच का नाम master है, तो इसे master कर दें
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'  # यहाँ Node.js का वर्शन 22 सेट किया गया है
+
+      # अगर आपके प्रोजेक्ट में package.json है और बिल्ड करना है, तो नीचे से '#' हटा दें
+      # - name: Install dependencies
+      #   run: npm install
+      
+      # - name: Build project
+      #   run: npm run build
