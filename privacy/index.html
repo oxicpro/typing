@@ -364,8 +364,8 @@
         }
 
         // Smart Back Button: instantly closes tab if opened from site, or navigates back to Typing Test
-        document.getElementById('nav-back-btn').addEventListener('click', (e) => {
-            e.preventDefault();
+        window.handleGoBack = function(e) {
+            if (e) e.preventDefault();
             if (window.opener && !window.opener.closed) {
                 window.close();
                 return;
@@ -375,7 +375,9 @@
                 return;
             }
             window.location.href = 'index.html';
-        });
+        };
+
+        document.getElementById('nav-back-btn')?.addEventListener('click', window.handleGoBack);
     </script>
 </body>
 </html>
