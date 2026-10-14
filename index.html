@@ -1046,6 +1046,18 @@
 
         <input type="text" id="hidden-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
 
+        <!-- Site Footer (Essential for Google AdSense & User Trust) -->
+        <footer style="margin-top: 40px; padding: 25px 0 15px; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-muted); text-align: center;">
+            <div style="display: flex; gap: 18px; align-items: center; flex-wrap: wrap; justify-content: center;">
+                <a href="privacy.html" target="_blank" style="color: var(--primary-blue); text-decoration: none; font-weight: 600;"> Privacy Policy</a>
+                <span>&bull;</span>
+                <a href="blogs/" target="_blank" style="color: var(--primary-blue); text-decoration: none; font-weight: 600;"> Blogs</a>
+                <span>&bull;</span>
+                <span>Contact: <a href="mailto:krishandevkumar792@gmail.com" style="color: var(--text-muted); text-decoration: none;">krishandevkumar792@gmail.com</a></span>
+            </div>
+            <div>&copy; 2026 TypingTest &bull; Developed by <strong>Oxicpro Team</strong></div>
+        </footer>
+
     </div>
 
     <script>
@@ -1601,8 +1613,12 @@
             document.getElementById('settings-drawer').classList.add('open');
             document.getElementById('drawer-backdrop').classList.add('visible');
         });
-        
         document.getElementById('menu-logout').addEventListener('click', () => signOut(auth));
+        
+        document.getElementById('menu-privacy').addEventListener('click', () => {
+            userDropdown.classList.remove('show');
+            window.open('privacy.html', '_blank');
+        });
 
         // Toggle Dropdown
         userAvatar.addEventListener('click', (e) => {
