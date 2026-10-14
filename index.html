@@ -893,7 +893,7 @@
             <div class="nav-links">
                 <!-- Test Type Dropdown -->
                 <div class="dropdown-wrapper">
-                    <div class="nav-link dropdown-toggle"><b>Typing Test ▾</b></div>
+                    <div class="nav-link dropdown-toggle">Typing Test ▾</div>
                     <div class="dropdown-menu" id="test-type-menu">
                         <div class="nav-item" data-mode="time" data-val="60">1 Min Test</div>
                         <div class="nav-item" data-mode="time" data-val="120">2 Min Test</div>
@@ -903,10 +903,10 @@
                         <div class="nav-item" data-mode="page" data-val="3">3 Page Test</div>
                     </div>
                 </div>
-                <div class="nav-link" id="nav-blogs" style="cursor: pointer;"><b>Blogs</b></div>
-                <div class="nav-link" id="nav-notif" style="cursor: pointer;"><b>Notifications</b><span id="badge-notif">0</span></div>
-                <div class="nav-link" id="nav-history" style="cursor: pointer;"><b>History</b></div>
-                <div class="nav-link" id="nav-leaderboard" style="cursor: pointer;"><b>Top Typers</b></div>
+                <a href="https://oxicpro.github.io/typing_blogs/" target="_blank" rel="noopener noreferrer" class="nav-link" id="nav-blogs" style="cursor: pointer;">📝 Blogs</a>
+                <div class="nav-link" id="nav-notif" style="cursor: pointer;">🔔 Notifications <span id="badge-notif">0</span></div>
+                <div class="nav-link" id="nav-history" style="cursor: pointer;">📈 History</div>
+                <div class="nav-link" id="nav-leaderboard" style="cursor: pointer;">🏆 Top Typers</div>
 
                 <div style="width: 1px; height: 30px; background: var(--border-color); margin: 0 10px;"></div>
 
@@ -922,10 +922,10 @@
                     <div id="user-avatar-container" style="display: none; position: relative;">
                         <div id="user-avatar" class="avatar-btn">U</div>
                         <div id="user-dropdown" class="avatar-dropdown">
-                            <div class="dropdown-item" id="menu-profile">Profile</div>
-                            <div class="dropdown-item" id="menu-settings">Settings</div>
-                            <div class="dropdown-item" id="menu-privacy">Privacy</div>
-                            <div class="dropdown-item" id="menu-logout">Logout</div>
+                            <div class="dropdown-item" id="menu-profile">👤 Profile</div>
+                            <div class="dropdown-item" id="menu-settings">⚙️ Settings</div>
+                            <div class="dropdown-item" id="menu-privacy">🔒 Privacy</div>
+                            <div class="dropdown-item" id="menu-logout">🚪 Logout</div>
                         </div>
                     </div>
                 </div>
@@ -996,7 +996,7 @@
 
         <!-- Leaderboard View (Hidden by default) -->
         <div id="leaderboard-view" style="display: none; flex-direction: column; gap: 20px;">
-            <h2 style="color: var(--primary-blue);">Top Typers</h2>
+            <h2 style="color: var(--primary-blue);">🏆 Top Typers</h2>
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
                 <input type="text" id="leaderboard-search" placeholder="Search by Username..." style="flex: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 1rem;">
                 <button id="btn-leaderboard-search" style="padding: 10px 20px; background: var(--primary-blue); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Search</button>
@@ -1176,16 +1176,7 @@
                     startTest();
                 });
             });
-
-            // Blogs Nav
-            document.getElementById('nav-blogs').addEventListener('click', () => {
-                document.getElementById('test-view').style.display = 'none';
-                document.getElementById('results-view').style.display = 'none';
-                document.getElementById('history-view').style.display = 'none';
-                document.getElementById('leaderboard-view').style.display = 'none';
-                document.getElementById('blog-view').style.display = 'flex';
-                loadBlogsFrontend();
-            });
+            // Blogs link opens external URL in new tab (no local view switch needed)
 
             // History Nav
             document.getElementById('nav-history').addEventListener('click', () => {
@@ -1824,7 +1815,7 @@
             toast.style.zIndex = '9999';
             toast.style.maxWidth = '300px';
             toast.style.animation = 'slideIn 0.3s forwards';
-            toast.innerHTML = `<strong>Notification</strong><br><span style="font-size:0.9rem">${msg}</span>`;
+            toast.innerHTML = `<strong>🔔 Notification</strong><br><span style="font-size:0.9rem">${msg}</span>`;
             document.body.appendChild(toast);
             
             // Auto hide toast after 10s
