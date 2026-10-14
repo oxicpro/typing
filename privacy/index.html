@@ -3,105 +3,359 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy Policy - SwiftCode QR Generator</title>
+    <title>Privacy Policy - TypingTest</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-body: #f4f5f7;
+            --bg-content: #ffffff;
+            --text-main: #333333;
+            --text-muted: #64748b;
+            --primary-blue: #0073e6;
+            --primary-blue-hover: #005bb5;
+            --border-color: #e2e8f0;
+            --badge-bg: #e0f2fe;
+            --badge-text: #0369a1;
+            --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #121212;
+            --bg-content: #1e1e1e;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --primary-blue: #3b82f6;
+            --primary-blue-hover: #2563eb;
+            --border-color: #334155;
+            --badge-bg: #1e293b;
+            --badge-text: #38bdf8;
+            --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            line-height: 1.6;
-            color: #334155;
-            background-color: #f8fafc;
+            font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
             margin: 0;
-            padding: 0;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            line-height: 1.7;
         }
+
         .container {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 32px;
-            background: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            border: 1px solid #e2e8f0;
+            width: 100%;
+            max-width: 860px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
+
+        .header-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            background: var(--bg-content);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .nav-back {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+        .nav-back:hover {
+            color: var(--primary-blue-hover);
+        }
+
+        .policy-card {
+            background: var(--bg-content);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+        }
+
         h1 {
-            color: #0f172a;
-            border-bottom: 2px solid #38bdf8;
-            padding-bottom: 12px;
-            font-size: 28px;
+            color: var(--primary-blue);
+            font-size: 2rem;
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-weight: 700;
         }
+
+        .last-updated {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
         h2 {
-            color: #1e293b;
-            margin-top: 28px;
-            font-size: 20px;
-            border-left: 4px solid #6366f1;
-            padding-left: 10px;
+            color: var(--text-main);
+            font-size: 1.35rem;
+            margin-top: 32px;
+            margin-bottom: 12px;
+            font-weight: 700;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
+
         p, li {
-            font-size: 15px;
-            color: #475569;
+            color: var(--text-main);
+            font-size: 1rem;
         }
+
         ul {
-            padding-left: 20px;
+            padding-left: 24px;
+            margin: 12px 0;
         }
-        .contact-box {
-            background-color: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            padding: 16px;
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        /* Highlight Notice Box */
+        .highlight-box {
+            background: var(--badge-bg);
+            border-left: 4px solid var(--primary-blue);
+            padding: 16px 20px;
             border-radius: 8px;
-            margin-top: 20px;
+            margin: 18px 0;
         }
-        .contact-box p {
-            margin: 4px 0;
-            color: #166534;
-            font-weight: 500;
+
+        .highlight-box p {
+            color: var(--badge-text);
+            margin: 0;
+            font-weight: 600;
         }
+
+        a {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .contact-box {
+            margin-top: 35px;
+            padding: 24px;
+            border-radius: 10px;
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+        }
+
+        .contact-box h3 {
+            margin-top: 0;
+            color: var(--primary-blue);
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .developer-badge {
+            display: inline-block;
+            background: var(--primary-blue);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+        }
+
         .footer {
             text-align: center;
-            margin-top: 40px;
-            font-size: 12px;
-            color: #94a3b8;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 15px;
+            padding-bottom: 20px;
+        }
+
+        @media (max-width: 640px) {
+            .policy-card {
+                padding: 24px 18px;
+            }
+            h1 {
+                font-size: 1.6rem;
+            }
+            h2 {
+                font-size: 1.2rem;
+            }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Privacy Policy</h1>
-    <p><strong>Last Updated: June 2026</strong></p>
-    
-    <p>Welcome to <strong>SwiftCode QR Generator</strong>. Your privacy is highly important to us. This Privacy Policy explains how our mobile application handles user information, data collection, and security rules while ensuring compliance with app store standards.</p>
+    <div class="container">
+        <!-- Top Navigation -->
+        <nav class="header-nav">
+            <a href="index.html" class="nav-back">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to Typing Test
+            </a>
+            <span style="font-weight: 700; color: var(--text-muted); font-size: 0.9rem;">TypingTest</span>
+        </nav>
 
-    <h2>1. Data Collection and Usage</h2>
-    <p>Our application is designed to function primarily as an <strong>offline utility</strong>. We respect your privacy and follow a strict data minimization policy:</p>
-    <ul>
-        <li><strong>No Personal Data Collection:</strong> We do not collect, request, store, or share any personal identity information such as names, phone numbers, email addresses, or device locations.</li>
-        <li><strong>Local Processing:</strong> All text, URLs, or inputs you enter to generate QR codes are processed entirely locally on your device. We do not have any remote server access to your data or generated QR codes.</li>
-    </ul>
+        <!-- Main Policy Content -->
+        <main class="policy-card">
+            <h1>Privacy Policy</h1>
+            <div class="last-updated">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                Last Updated & Effective: October 2026
+            </div>
 
-    <h2>2. Third-Party Services (Advertisements)</h2>
-    <p>To keep this application free to use, we integrate third-party advertising services. Currently, we only use <strong>Google AdMob</strong>. These third-party networks may use device identifiers, cookies, or tracking technologies to serve relevant non-personalized or personalized advertisements based on your interests.</p>
-    <p>Google AdMob operates under its own separate privacy guidelines. You can read their framework here: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google Privacy & Terms</a>.</p>
+            <p>
+                Welcome to <strong>TypingTest</strong> (available at <a href="https://oxicpro.github.io/typing/">https://oxicpro.github.io/typing/</a>). 
+                Your privacy is of the utmost importance to us. This Privacy Policy outlines the types of information we collect, 
+                how it is protected, how it is used, and your full rights over your data.
+            </p>
 
-    <h2>3. Offline Capabilities and Security</h2>
-    <p>Since the core engine of the app runs offline without transmitting data to external servers, your information is protected against unauthorized digital interceptions. The network permission required by the app is strictly used to display advertisements via Google AdMob when an active internet connection is available.</p>
+            <div class="highlight-box">
+                <p>
+                    🔒 <strong>Strict Email Privacy Guarantee:</strong> Your email address (e.g. Gmail) is strictly confidential. 
+                    It is never displayed publicly, never shown on the leaderboard, and never sold, rented, or shared with any third party. 
+                    Only you have access to your personal login credentials.
+                </p>
+            </div>
 
-    <h2>4. Children's Privacy</h2>
-    <p>Our services do not address anyone under the age of 3. We do not knowingly collect personally identifiable information from children. If we discover that a child under 3 has provided us with personal information, we immediately delete this from our logs.</p>
+            <!-- Section 1 -->
+            <h2>1. Information We Collect</h2>
+            <p>We only collect information necessary to provide an accurate, high-performance typing test experience and track your progress:</p>
+            <ul>
+                <li>
+                    <strong>Authentication & Profile Data:</strong> When you sign up or log in via Email or Google Sign-In, we securely store your User ID (UID), Email Address, and Chosen Username. Your username is the <em>only</em> identifier displayed publicly on the Top Typers leaderboard.
+                </li>
+                <li>
+                    <strong>Typing Test Performance Metrics:</strong> We save your typing speed (Words Per Minute / WPM), accuracy percentage (%), test duration, and timestamps. This allows you to visualize your improvement on historical performance charts.
+                </li>
+                <li>
+                    <strong>Community Blog Interactions:</strong> When you read or like blogs, we store anonymous or user-linked IDs to ensure each reader's view is counted only once and each person can cast only one heart like.
+                </li>
+                <li>
+                    <strong>Local Device Preferences:</strong> User interface choices such as Dark Mode, Skip Error mode, Disable Backspace mode, and sound effects are saved locally in your browser's <code>localStorage</code> and are never transmitted to outside servers.
+                </li>
+            </ul>
 
-    <h2>5. Changes to This Privacy Policy</h2>
-    <p>We may update our Privacy Policy from time to time. You are advised to review this page periodically for any changes. Any updates made will be posted directly on this URL and will take effect immediately upon deployment.</p>
+            <!-- Section 2 -->
+            <h2>2. Email Confidentiality & Public Leaderboard Rules</h2>
+            <p>
+                We believe in total transparency and privacy-first design:
+            </p>
+            <ul>
+                <li><strong>No Public Email Exposure:</strong> Other players and visitors on the website can <strong>never</strong> view your email address.</li>
+                <li><strong>Display Name Only:</strong> On the public leaderboard ("Top Typers"), only your self-chosen Username and your typing score (WPM & Accuracy) are displayed.</li>
+                <li><strong>Profile Name Updates:</strong> You have full control to change your public display name at any time from your settings panel.</li>
+            </ul>
 
-    <h2>6. Grievance Redressal & Contact Information</h2>
-    <p>In accordance with the Information Technology Act and app store guidelines, if you have any questions, suggestions, or complaints regarding this Privacy Policy or app services, you may directly contact our designated Developer and Grievance Officer.</p>
-    
-    <div class="contact-box">
-        <p><strong>Developer / Grievance Officer:</strong> Krishan Dev Kumar</p>
-        <p><strong>Email Support:</strong> <a href="mailto:krishandevkumar792@gmail.com">krishandevkumar792@gmail.com</a></p>
+            <!-- Section 3 -->
+            <h2>3. Third-Party Advertisements & Google AdSense Policy</h2>
+            <p>
+                To keep this typing test 100% free for students and typists worldwide, our website may display third-party advertisements served by partners such as <strong>Google AdSense</strong>:
+            </p>
+            <ul>
+                <li>
+                    Third-party vendors, including Google, use cookies to serve ads based on a user's prior visits to this website or other websites on the Internet.
+                </li>
+                <li>
+                    Google's use of advertising cookies (such as the DoubleClick DART cookie) enables it and its partners to serve ads to our users based on their visit to our site and/or other sites on the Internet.
+                </li>
+                <li>
+                    <strong>Personalized Advertising Opt-Out:</strong> Users may opt out of personalized advertising by visiting Google's <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer">Ads Settings</a>. Alternatively, you can opt out of third-party vendor cookies by visiting <a href="https://www.aboutads.info" target="_blank" rel="noopener noreferrer">www.aboutads.info</a>.
+                </li>
+            </ul>
+
+            <!-- Section 4 -->
+            <h2>4. Cookies & Web Technologies</h2>
+            <p>
+                We use cookies and browser storage technologies strictly for essential functionality:
+            </p>
+            <ul>
+                <li><strong>Essential Cookies:</strong> Kept by Google Firebase Authentication to keep you securely signed in across browsing sessions.</li>
+                <li><strong>Preferences Storage:</strong> Browser <code>localStorage</code> is used to remember your theme (Dark / Light) and typing options without sending data across the network.</li>
+                <li><strong>Third-Party Advertising Cookies:</strong> Used by advertising partners as described in Section 3 above. You can disable cookies at any time via your browser settings.</li>
+            </ul>
+
+            <!-- Section 5 -->
+            <h2>5. Cloud Infrastructure & Security (Google Firebase)</h2>
+            <p>
+                All account data and typing scores are housed in secure, enterprise-grade cloud databases provided by <strong>Google Cloud Firestore</strong>. 
+                Data transmission is protected end-to-end using industry-standard <strong>HTTPS/TLS 256-bit encryption</strong>, preventing unauthorized interception, theft, or tampering.
+            </p>
+
+            <!-- Section 6 -->
+            <h2>6. Children's Online Privacy Protection (COPPA)</h2>
+            <p>
+                Our typing test is an educational tool designed for general audiences, students, and professionals. We do not knowingly collect personally identifiable information from children under the age of 13. If you believe a child has provided us with personal information, please contact us immediately, and we will delete the information promptly.
+            </p>
+
+            <!-- Section 7 -->
+            <h2>7. Your Data Rights & Deletion Requests</h2>
+            <p>
+                You retain complete ownership over your data:
+            </p>
+            <ul>
+                <li>You can inspect your saved test histories and graphs at any time in the <strong>📈 History</strong> section.</li>
+                <li>You can update your username in real-time from the <strong>⚙ Settings</strong> drawer.</li>
+                <li>If you wish to have your account, scores, or all associated records permanently erased from our Firebase database, simply contact us at our dedicated email below, and your request will be honored immediately.</li>
+            </ul>
+
+            <!-- Section 8 -->
+            <h2>8. Changes to This Privacy Policy</h2>
+            <p>
+                We may update our Privacy Policy periodically to reflect technological improvements, legal requirements, or new features. Any modifications will be posted directly on this page with an updated "Last Updated" date.
+            </p>
+
+            <!-- Section 9: Developer & Contact Box -->
+            <div class="contact-box">
+                <span class="developer-badge">Project Developer</span>
+                <h3>Developed by Oxicpro Team</h3>
+                <p>
+                    If you have any questions, feedback, privacy concerns, or requests regarding your personal data, please contact the developer directly:
+                </p>
+                <p style="margin-bottom: 0;">
+                    📧 <strong>Official Email:</strong> 
+                    <a href="mailto:Oxicpro@gmail.com" style="font-weight: 700;">Oxicpro@gmail.com</a>
+                </p>
+            </div>
+        </main>
+
+        <footer class="footer">
+            &copy; 2026 TypingTest &bull; Developed with ❤️ by <strong>Oxicpro Team</strong> &bull; All Rights Reserved.
+        </footer>
     </div>
 
-    <div class="footer">
-        &copy; 2026 SwiftCode QR Generator. All Rights Reserved.
-    </div>
-</div>
-
+    <script>
+        // Synchronize dark theme with the main app
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.dataset.theme = 'dark';
+        }
+    </script>
 </body>
 </html>
