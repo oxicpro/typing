@@ -40,7 +40,7 @@
             background: var(--bg-body);
             color: var(--text-main);
             margin: 0;
-            padding: 20px 20px 0;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -90,6 +90,12 @@
             color: var(--text-main);
         }
 
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
         .user-badge {
             font-size: 0.85rem;
             font-weight: 600;
@@ -99,14 +105,44 @@
             gap: 8px;
         }
 
+        .btn-header-auth {
+            background: var(--primary-blue);
+            color: #ffffff;
+            border: none;
+            padding: 7px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-header-auth:hover {
+            background: var(--primary-blue-hover);
+        }
+
+        .btn-header-logout {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-header-logout:hover {
+            color: #e53e3e;
+            border-color: #e53e3e;
+        }
+
         .blog-container {
             width: 100%;
             max-width: 820px;
             display: flex;
             flex-direction: column;
             gap: 25px;
-            flex: 1;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
 
         .blog-card {
@@ -313,19 +349,334 @@
             transform: translateX(-50%) translateY(0);
         }
 
-        .bottom-footer {
+        /* ======== MODALS ======== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.show { display: flex; }
+
+        /* YouTube-Style Like Prompt Card */
+        .like-prompt-card {
+            background: var(--bg-content);
             width: 100%;
-            margin-top: auto;
-            padding: 30px 15px 25px;
-            border-top: 1px solid var(--border-color);
+            max-width: 380px;
+            border-radius: 16px;
+            padding: 28px 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+            text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
-            font-size: 0.9rem;
+            gap: 16px;
+            border: 1px solid var(--border-color);
+            animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.85); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .like-prompt-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--heart-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--heart-red);
+        }
+        .like-prompt-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: var(--heart-red);
+        }
+
+        .like-prompt-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        .like-prompt-desc {
+            font-size: 0.95rem;
             color: var(--text-muted);
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .like-prompt-actions {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            margin-top: 6px;
+        }
+
+        .btn-prompt-signin {
+            flex: 1;
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 24px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-prompt-signin:hover {
+            background: var(--primary-blue-hover);
+        }
+
+        .btn-prompt-cancel {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            padding: 12px 18px;
+            border-radius: 24px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-prompt-cancel:hover {
+            color: var(--text-main);
+            border-color: var(--text-main);
+        }
+
+        /* Full Auth Modal */
+        .auth-modal {
+            background: var(--bg-content);
+            width: 100%;
+            max-width: 400px;
+            border-radius: 14px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+            overflow: hidden;
+            position: relative;
+            border: 1px solid var(--border-color);
+            animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .auth-close {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            line-height: 1;
+            z-index: 10;
+        }
+        .auth-close:hover { color: var(--text-main); }
+
+        .auth-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .auth-tab {
+            flex: 1;
             text-align: center;
+            padding: 15px;
+            font-weight: 700;
+            cursor: pointer;
             background: var(--bg-body);
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+        .auth-tab.active {
+            background: var(--bg-content);
+            color: var(--primary-blue);
+            border-bottom: 3px solid var(--primary-blue);
+        }
+
+        .auth-body { padding: 25px; }
+        .auth-form { display: none; flex-direction: column; gap: 14px; }
+        .auth-form.active { display: flex; }
+
+        .auth-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            background: var(--bg-content);
+            color: var(--text-main);
+            outline: none;
+        }
+        .auth-input:focus {
+            border-color: var(--primary-blue);
+        }
+
+        .auth-error {
+            color: #e53e3e;
+            font-size: 0.85rem;
+            min-height: 18px;
+            font-weight: 600;
+        }
+
+        .btn-submit {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-submit:hover { background-color: var(--primary-blue-hover); }
+
+        .btn-google {
+            background-color: #ffffff;
+            color: #333333;
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .btn-google:hover { background-color: #f8fafc; border-color: #cbd5e1; }
+        .btn-google img { width: 18px; height: 18px; }
+
+        /* ======== SOCIAL SHARE POPUP MODAL ======== */
+        .share-modal {
+            background: var(--bg-content);
+            width: 100%;
+            max-width: 440px;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+            border: 1px solid var(--border-color);
+            position: relative;
+            animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .share-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .share-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        .share-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            line-height: 1;
+        }
+        .share-close:hover { color: var(--text-main); }
+
+        .share-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px 10px;
+            margin: 18px 0 22px;
+        }
+
+        .share-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 7px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            user-select: none;
+        }
+        .share-item:hover {
+            transform: translateY(-3px);
+        }
+
+        .share-icon-circle {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .share-item:hover .share-icon-circle {
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+        .share-icon-circle svg {
+            width: 26px;
+            height: 26px;
+            fill: currentColor;
+        }
+
+        .share-icon-whatsapp { background-color: #25D366; }
+        .share-icon-x { background-color: #000000; }
+        .share-icon-facebook { background-color: #1877F2; }
+        .share-icon-telegram { background-color: #229ED9; }
+        .share-icon-linkedin { background-color: #0A66C2; }
+        .share-icon-native { background: linear-gradient(135deg, #6366f1, #a855f7); }
+
+        .share-copy-box {
+            display: flex;
+            gap: 8px;
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px;
+            align-items: center;
+        }
+        .share-copy-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            padding: 6px 10px;
+        }
+        .btn-copy-link {
+            background: var(--primary-blue);
+            color: #ffffff;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-copy-link:hover {
+            background: var(--primary-blue-hover);
+        }
+        .btn-copy-link.copied {
+            background: #16a34a;
         }
     </style>
 </head>
@@ -333,7 +684,7 @@
 
     <div class="header-bar">
         <div class="header-left">
-            <a href="../" class="nav-back" id="nav-back-btn">
+            <a href="./" class="nav-back" id="nav-back-btn" onclick="handleGoBack(event)">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="19" y1="12" x2="5" y2="12"></line>
                     <polyline points="12 19 5 12 12 5"></polyline>
@@ -342,8 +693,12 @@
             </a>
             <span class="header-title">📝 Community Blogs</span>
         </div>
-        <div class="user-badge" id="user-badge">
-            <span id="user-status">👤 Guest</span>
+        <div class="header-right">
+            <div class="user-badge" id="user-badge">
+                <span id="user-status">👤 Guest</span>
+            </div>
+            <button class="btn-header-auth" id="btn-header-signin">Sign In</button>
+            <button class="btn-header-logout" id="btn-header-logout" style="display: none;">Logout</button>
         </div>
     </div>
 
@@ -353,24 +708,146 @@
 
     <div class="toast-copied" id="toast-copied">Link copied to clipboard!</div>
 
-    <!-- Very Bottom Footer -->
-    <footer class="bottom-footer">
-        <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap; justify-content: center;">
-            <a href="../privacy/" target="_blank" style="color: var(--primary-blue); text-decoration: none; font-weight: 600;">🔒 Privacy Policy</a>
-            <span>&bull;</span>
-            <a href="../" style="color: var(--primary-blue); text-decoration: none; font-weight: 600;">Typing Test</a>
-            <span>&bull;</span>
-            <span>Contact: <a href="mailto:oxicpro@gmail.com" style="color: var(--primary-blue); text-decoration: none; font-weight: 600;">oxicpro@gmail.com</a></span>
+    <!-- YouTube-Style Like Prompt Modal for Guests -->
+    <div class="modal-overlay" id="like-prompt-overlay">
+        <div class="like-prompt-card">
+            <div class="like-prompt-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+            </div>
+            <h3 class="like-prompt-title">Want to like this blog?</h3>
+            <p class="like-prompt-desc">Sign in or sign up to make your opinion count and support the author!</p>
+            <div class="like-prompt-actions">
+                <button class="btn-prompt-cancel" id="btn-prompt-cancel">Cancel</button>
+                <button class="btn-prompt-signin" id="btn-prompt-signin">Sign In / Sign Up</button>
+            </div>
         </div>
-        <div style="font-size: 0.85rem; color: var(--text-muted);">&copy; 2026 TypingTest &bull; Developed by <strong>Oxicpro Team</strong> &bull; All Rights Reserved.</div>
-    </footer>
+    </div>
+
+    <!-- Social Share Popup Modal -->
+    <div class="modal-overlay" id="share-modal-overlay">
+        <div class="share-modal">
+            <div class="share-header">
+                <h3>Share Blog</h3>
+                <button class="share-close" id="share-close">&times;</button>
+            </div>
+            
+            <p id="share-blog-title" style="font-size: 0.95rem; font-weight: 600; color: var(--text-muted); margin-top: 0; margin-bottom: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></p>
+
+            <div class="share-grid">
+                <!-- WhatsApp -->
+                <div class="share-item" id="share-btn-whatsapp">
+                    <div class="share-icon-circle share-icon-whatsapp">
+                        <svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 15 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67M9.53 7.37C9.37 7.37 9.1 7.43 8.87 7.69C8.64 7.95 8 8.55 8 9.77C8 10.99 8.89 12.16 9.01 12.33C9.14 12.5 10.74 14.97 13.2 16.03C15.25 16.91 15.67 16.74 16.12 16.7C16.57 16.66 17.58 16.1 17.79 15.52C18 14.93 18 14.43 17.93 14.33C17.86 14.22 17.69 14.16 17.44 14.04C17.19 13.92 15.96 13.31 15.73 13.23C15.5 13.15 15.34 13.11 15.17 13.36C15 13.61 14.53 14.16 14.38 14.33C14.24 14.5 14.09 14.52 13.84 14.4C13.59 14.28 12.79 14.01 11.84 13.17C11.1 12.51 10.6 11.7 10.45 11.45C10.31 11.2 10.44 11.07 10.56 10.95C10.67 10.84 10.81 10.66 10.93 10.51C11.06 10.36 11.1 10.26 11.18 10.09C11.26 9.92 11.22 9.78 11.16 9.66C11.1 9.53 10.63 8.38 10.43 7.9C10.24 7.43 10.04 7.49 9.89 7.49C9.75 7.48 9.58 7.37 9.53 7.37Z"/></svg>
+                    </div>
+                    <span>WhatsApp</span>
+                </div>
+
+                <!-- Twitter / X -->
+                <div class="share-item" id="share-btn-x">
+                    <div class="share-icon-circle share-icon-x">
+                        <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    </div>
+                    <span>X</span>
+                </div>
+
+                <!-- Facebook -->
+                <div class="share-item" id="share-btn-facebook">
+                    <div class="share-icon-circle share-icon-facebook">
+                        <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    </div>
+                    <span>Facebook</span>
+                </div>
+
+                <!-- Telegram -->
+                <div class="share-item" id="share-btn-telegram">
+                    <div class="share-icon-circle share-icon-telegram">
+                        <svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                    </div>
+                    <span>Telegram</span>
+                </div>
+
+                <!-- LinkedIn -->
+                <div class="share-item" id="share-btn-linkedin">
+                    <div class="share-icon-circle share-icon-linkedin">
+                        <svg viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                    </div>
+                    <span>LinkedIn</span>
+                </div>
+
+                <!-- More Apps (Native Phone Share) -->
+                <div class="share-item" id="share-btn-native">
+                    <div class="share-icon-circle share-icon-native">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="18" cy="5" r="3"></circle>
+                            <circle cx="6" cy="12" r="3"></circle>
+                            <circle cx="18" cy="19" r="3"></circle>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        </svg>
+                    </div>
+                    <span>More</span>
+                </div>
+            </div>
+
+            <!-- Copy Link Box -->
+            <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">Or copy link</div>
+            <div class="share-copy-box">
+                <input type="text" class="share-copy-input" id="share-link-input" readonly>
+                <button class="btn-copy-link" id="btn-copy-share-link">Copy</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full Auth Modal (Email & Google Sign In / Sign Up) -->
+    <div class="modal-overlay" id="auth-modal-overlay">
+        <div class="auth-modal">
+            <button class="auth-close" id="auth-close">&times;</button>
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="signin">Sign In</div>
+                <div class="auth-tab" data-tab="signup">Sign Up</div>
+            </div>
+            
+            <div class="auth-body">
+                <!-- Sign In Form -->
+                <div class="auth-form active" id="form-signin">
+                    <input type="email" class="auth-input" id="signin-email" placeholder="Email Address">
+                    <input type="password" class="auth-input" id="signin-password" placeholder="Password">
+                    <div class="auth-error" id="signin-error"></div>
+                    <button class="btn-submit" id="btn-signin-submit">Sign In</button>
+                    <button class="btn-google" id="btn-signin-google">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                        Sign In with Google
+                    </button>
+                </div>
+                
+                <!-- Sign Up Form -->
+                <div class="auth-form" id="form-signup">
+                    <input type="text" class="auth-input" id="signup-username" placeholder="Username (Unique)">
+                    <input type="email" class="auth-input" id="signup-email" placeholder="Email Address">
+                    <input type="password" class="auth-input" id="signup-password" placeholder="Password (Min 8 chars, A-a-1-@)">
+                    <input type="password" class="auth-input" id="signup-confirm" placeholder="Confirm Password">
+                    <div class="auth-error" id="signup-error"></div>
+                    <button class="btn-submit" id="btn-signup-submit">Sign Up</button>
+                    <button class="btn-google" id="btn-signup-google">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                        Sign Up with Google
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
         import { 
-            getFirestore, collection, getDocs, doc, updateDoc, arrayUnion, arrayRemove, increment 
+            getFirestore, collection, getDocs, doc, setDoc, updateDoc, arrayUnion, arrayRemove, increment, query, where 
         } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+        import { 
+            getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, 
+            signInWithPopup, GoogleAuthProvider, signOut 
+        } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCegeB9vk5Ia6rF1Rk0Ss_AOxHYq9YU5VI",
@@ -384,12 +861,14 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+        const googleProvider = new GoogleAuthProvider();
 
         let currentUser = null;
+        let pendingLikeBlogId = null;
 
         // Smart Back Button: instantly closes tab if opened from typing test, or navigates back to Typing Test
-        document.getElementById('nav-back-btn').addEventListener('click', (e) => {
-            e.preventDefault();
+        window.handleGoBack = function(e) {
+            if (e) e.preventDefault();
             if (window.opener && !window.opener.closed) {
                 window.close();
                 return;
@@ -398,44 +877,271 @@
                 window.history.back();
                 return;
             }
-            window.location.href = '../';
-        });
+            window.location.href = './';
+        };
 
-        // Visitor ID generator (works for both guests and logged-in users)
+        // Visitor ID generator (Unique per device/browser for Guests, or UID for Users)
         function getVisitorId() {
             if (currentUser && currentUser.uid) {
                 return currentUser.uid;
             }
-            let vid = localStorage.getItem('typing_blog_visitor_id');
+            let vid = localStorage.getItem('typing_blog_guest_id');
             if (!vid) {
                 vid = 'guest_' + Math.random().toString(36).substring(2, 9) + '_' + Date.now();
-                localStorage.setItem('typing_blog_visitor_id', vid);
+                localStorage.setItem('typing_blog_guest_id', vid);
             }
             return vid;
         }
 
-        // Auth state monitor with Guest Anonymous Login support
+        // Local tracking of viewed blogs (1 view per person)
+        function isBlogViewedLocally(blogId) {
+            try {
+                const map = JSON.parse(localStorage.getItem('viewed_blogs_registry') || '{}');
+                return !!map[blogId];
+            } catch(e) {
+                return false;
+            }
+        }
+
+        function markBlogViewedLocally(blogId) {
+            try {
+                const map = JSON.parse(localStorage.getItem('viewed_blogs_registry') || '{}');
+                map[blogId] = true;
+                localStorage.setItem('viewed_blogs_registry', JSON.stringify(map));
+            } catch(e) {}
+        }
+
+        // Auth state monitor
         onAuthStateChanged(auth, async (user) => {
-            if (user) {
+            const btnHeaderSignin = document.getElementById('btn-header-signin');
+            const btnHeaderLogout = document.getElementById('btn-header-logout');
+            const userStatus = document.getElementById('user-status');
+
+            if (user && !user.isAnonymous) {
                 currentUser = user;
-                if (user.isAnonymous) {
-                    document.getElementById('user-status').textContent = `👤 Guest`;
-                } else {
-                    const displayName = user.displayName || user.email.split('@')[0];
-                    document.getElementById('user-status').textContent = `👤 ${displayName}`;
+                let displayName = user.displayName || user.email.split('@')[0];
+
+                try {
+                    const snap = await getDocs(query(collection(db, "users"), where("email", "==", user.email)));
+                    if (!snap.empty) {
+                        const userData = snap.docs[0].data();
+                        if (userData.username) displayName = userData.username;
+                    }
+                } catch(e) {}
+
+                userStatus.textContent = `👤 ${displayName}`;
+                btnHeaderSignin.style.display = 'none';
+                btnHeaderLogout.style.display = 'inline-block';
+
+                document.getElementById('auth-modal-overlay').classList.remove('show');
+                document.getElementById('like-prompt-overlay').classList.remove('show');
+
+                if (pendingLikeBlogId) {
+                    const targetBlogId = pendingLikeBlogId;
+                    pendingLikeBlogId = null;
+                    setTimeout(() => window.toggleLike(targetBlogId), 300);
                 }
             } else {
-                // Sign in anonymously so guest views/likes pass Firestore security rules!
-                try {
-                    await signInAnonymously(auth);
-                    return;
-                } catch(err) {
-                    console.warn("Guest anonymous sign-in fallback:", err);
-                }
                 currentUser = null;
-                document.getElementById('user-status').textContent = `👤 Guest`;
+                userStatus.textContent = `👤 Guest`;
+                btnHeaderSignin.style.display = 'inline-block';
+                btnHeaderLogout.style.display = 'none';
             }
             loadBlogs();
+        });
+
+        // Header Auth Buttons
+        document.getElementById('btn-header-signin').addEventListener('click', () => {
+            document.getElementById('auth-modal-overlay').classList.add('show');
+        });
+        document.getElementById('btn-header-logout').addEventListener('click', () => signOut(auth));
+
+        // Like Prompt Modal Buttons
+        document.getElementById('btn-prompt-cancel').addEventListener('click', () => {
+            document.getElementById('like-prompt-overlay').classList.remove('show');
+            pendingLikeBlogId = null;
+        });
+
+        document.getElementById('btn-prompt-signin').addEventListener('click', () => {
+            document.getElementById('like-prompt-overlay').classList.remove('show');
+            document.getElementById('auth-modal-overlay').classList.add('show');
+        });
+
+        // Auth Modal Controls
+        document.getElementById('auth-close').addEventListener('click', () => {
+            document.getElementById('auth-modal-overlay').classList.remove('show');
+        });
+
+        const authTabs = document.querySelectorAll('.auth-tab');
+        const formSignin = document.getElementById('form-signin');
+        const formSignup = document.getElementById('form-signup');
+
+        authTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                authTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                if (tab.dataset.tab === 'signin') {
+                    formSignin.classList.add('active');
+                    formSignup.classList.remove('active');
+                } else {
+                    formSignin.classList.remove('active');
+                    formSignup.classList.add('active');
+                }
+            });
+        });
+
+        // Email Sign In
+        document.getElementById('btn-signin-submit').addEventListener('click', async () => {
+            const email = document.getElementById('signin-email').value.trim();
+            const password = document.getElementById('signin-password').value;
+            const errorEl = document.getElementById('signin-error');
+            errorEl.textContent = '';
+
+            if (!email || !password) {
+                errorEl.textContent = 'Please fill all fields.';
+                return;
+            }
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch(err) {
+                errorEl.textContent = err.message.replace('Firebase: ', '');
+            }
+        });
+
+        // Google Sign In (both forms)
+        const handleGoogleAuth = async (errorElementId) => {
+            const errorEl = document.getElementById(errorElementId);
+            errorEl.textContent = '';
+            try {
+                await signInWithPopup(auth, googleProvider);
+            } catch(err) {
+                errorEl.textContent = err.message.replace('Firebase: ', '');
+            }
+        };
+
+        document.getElementById('btn-signin-google').addEventListener('click', () => handleGoogleAuth('signin-error'));
+        document.getElementById('btn-signup-google').addEventListener('click', () => handleGoogleAuth('signup-error'));
+
+        // Email Sign Up
+        document.getElementById('btn-signup-submit').addEventListener('click', async () => {
+            const username = document.getElementById('signup-username').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const confirm = document.getElementById('signup-confirm').value;
+            const errorEl = document.getElementById('signup-error');
+            errorEl.textContent = '';
+
+            if (!username || !email || !password || !confirm) {
+                errorEl.textContent = 'All fields are required.';
+                return;
+            }
+            if (password !== confirm) {
+                errorEl.textContent = 'Passwords do not match.';
+                return;
+            }
+            if (password.length < 8) {
+                errorEl.textContent = 'Password must be at least 8 characters.';
+                return;
+            }
+
+            try {
+                const cred = await createUserWithEmailAndPassword(auth, email, password);
+                await setDoc(doc(db, "users", cred.user.uid), {
+                    username: username,
+                    email: email,
+                    createdAt: new Date().toISOString()
+                });
+            } catch(err) {
+                errorEl.textContent = err.message.replace('Firebase: ', '');
+            }
+        });
+
+        // ======== SOCIAL SHARE LOGIC ========
+        let currentShareUrl = '';
+        let currentShareTitle = '';
+
+        window.openShareModal = function(blogId, encodedTitle) {
+            currentShareTitle = decodeURIComponent(encodedTitle || 'Typing Test Blog');
+            currentShareUrl = window.location.origin + window.location.pathname + `#blog-${blogId}`;
+            
+            document.getElementById('share-blog-title').textContent = currentShareTitle;
+            document.getElementById('share-link-input').value = currentShareUrl;
+            
+            const copyBtn = document.getElementById('btn-copy-share-link');
+            copyBtn.textContent = 'Copy';
+            copyBtn.classList.remove('copied');
+
+            document.getElementById('share-modal-overlay').classList.add('show');
+        };
+
+        document.getElementById('share-close').addEventListener('click', () => {
+            document.getElementById('share-modal-overlay').classList.remove('show');
+        });
+
+        // Close share modal if clicking backdrop
+        document.getElementById('share-modal-overlay').addEventListener('click', (e) => {
+            if (e.target.id === 'share-modal-overlay') {
+                document.getElementById('share-modal-overlay').classList.remove('show');
+            }
+        });
+
+        // 1. WhatsApp Share
+        document.getElementById('share-btn-whatsapp').addEventListener('click', () => {
+            const text = encodeURIComponent(`*${currentShareTitle}*\nRead this blog on Typing Test:\n${currentShareUrl}`);
+            window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+        });
+
+        // 2. Twitter / X Share
+        document.getElementById('share-btn-x').addEventListener('click', () => {
+            const text = encodeURIComponent(`Check out this blog: ${currentShareTitle}`);
+            window.open(`https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(currentShareUrl)}`, '_blank');
+        });
+
+        // 3. Facebook Share
+        document.getElementById('share-btn-facebook').addEventListener('click', () => {
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentShareUrl)}`, '_blank');
+        });
+
+        // 4. Telegram Share
+        document.getElementById('share-btn-telegram').addEventListener('click', () => {
+            window.open(`https://t.me/share/url?url=${encodeURIComponent(currentShareUrl)}&text=${encodeURIComponent(currentShareTitle)}`, '_blank');
+        });
+
+        // 5. LinkedIn Share
+        document.getElementById('share-btn-linkedin').addEventListener('click', () => {
+            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentShareUrl)}`, '_blank');
+        });
+
+        // 6. Native Mobile Share (More Apps / System Sheet)
+        document.getElementById('share-btn-native').addEventListener('click', async () => {
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: currentShareTitle,
+                        text: currentShareTitle,
+                        url: currentShareUrl
+                    });
+                } catch(e) {}
+            } else {
+                navigator.clipboard.writeText(currentShareUrl).then(() => {
+                    showToast();
+                });
+            }
+        });
+
+        // 7. Copy Link Button
+        document.getElementById('btn-copy-share-link').addEventListener('click', () => {
+            const input = document.getElementById('share-link-input');
+            navigator.clipboard.writeText(input.value).then(() => {
+                const btn = document.getElementById('btn-copy-share-link');
+                btn.textContent = 'Copied! ✓';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
         });
 
         // Load and render all blogs with unique views & likes
@@ -474,32 +1180,26 @@
                     const data = item.data;
 
                     // 1. UNIQUE VIEW COUNT HANDLING (GUESTS & USERS)
-                    const viewedKey = `viewed_blog_${blogId}`;
-                    const hasViewedLocally = localStorage.getItem(viewedKey) === 'true';
+                    const hasViewedLocally = isBlogViewedLocally(blogId);
                     const hasViewedInDb = Array.isArray(data.viewedBy) && data.viewedBy.includes(visitorId);
 
                     if (!hasViewedLocally && !hasViewedInDb) {
-                        // First time this visitor (guest or user) views this blog:
-                        localStorage.setItem(viewedKey, 'true');
-                        // Optimistically increment view count so it reflects immediately on screen
-                        data.views = (data.views || 0) + 1;
-                        if (!data.viewedBy) data.viewedBy = [];
+                        markBlogViewedLocally(blogId);
+                        
+                        data.views = (Number(data.views) || 0) + 1;
+                        if (!Array.isArray(data.viewedBy)) data.viewedBy = [];
                         data.viewedBy.push(visitorId);
 
-                        // Save in Firestore
-                        try {
-                            updateDoc(doc(db, "blogs", blogId), {
-                                viewedBy: arrayUnion(visitorId),
-                                views: increment(1)
-                            });
-                        } catch (err) {
-                            console.warn("View registration note:", err);
-                        }
+                        updateDoc(doc(db, "blogs", blogId), {
+                            views: increment(1),
+                            viewedBy: arrayUnion(visitorId)
+                        }).catch(err => {
+                            console.warn("View Firestore note:", err.message);
+                        });
                     }
 
-                    // Calculate accurate view and like counts
-                    const viewsCount = Math.max(data.views || 0, Array.isArray(data.viewedBy) ? data.viewedBy.length : 0);
-                    const likesCount = Math.max(data.likes || 0, Array.isArray(data.likedBy) ? data.likedBy.length : 0);
+                    const viewsCount = Math.max(Number(data.views) || 0, Array.isArray(data.viewedBy) ? data.viewedBy.length : 0);
+                    const likesCount = Math.max(Number(data.likes) || 0, Array.isArray(data.likedBy) ? data.likedBy.length : 0);
 
                     // 2. CHECK IF CURRENT VISITOR HAS LIKED
                     const likedKey = `liked_blog_${blogId}`;
@@ -512,6 +1212,8 @@
                         month: 'short',
                         day: 'numeric'
                     }) : 'Recent';
+
+                    const safeTitle = (data.title || 'Typing Test Blog').replace(/'/g, "\\'");
 
                     html += `
                         <article class="blog-card" id="blog-${blogId}">
@@ -554,7 +1256,8 @@
                                     </div>
                                 </div>
 
-                                <button class="btn-share" onclick="window.shareBlog('${blogId}')" title="Share Blog">
+                                <!-- Social Share Button -->
+                                <button class="btn-share" onclick="window.openShareModal('${blogId}', '${encodeURIComponent(data.title || 'Typing Test Blog')}')" title="Share Blog">
                                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <circle cx="18" cy="5" r="3"></circle>
                                         <circle cx="6" cy="12" r="3"></circle>
@@ -577,23 +1280,27 @@
             }
         }
 
-        // Toggle Like: One person can only like once
+        // Toggle Like: Guests get YouTube-style Sign In prompt, logged-in users toggle directly
         window.toggleLike = async function(blogId) {
+            if (!currentUser || currentUser.isAnonymous) {
+                pendingLikeBlogId = blogId;
+                document.getElementById('like-prompt-overlay').classList.add('show');
+                return;
+            }
+
             const btn = document.getElementById(`btn-like-${blogId}`);
             const countEl = document.getElementById(`like-count-${blogId}`);
             if (!btn || !countEl) return;
 
-            // Prevent rapid multi-clicks
             if (btn.dataset.busy === "true") return;
             btn.dataset.busy = "true";
 
-            const visitorId = getVisitorId();
+            const visitorId = currentUser.uid;
             const likedKey = `liked_blog_${blogId}`;
             const isCurrentlyLiked = btn.classList.contains('liked');
             let currentCount = parseInt(countEl.textContent, 10) || 0;
 
             if (!isCurrentlyLiked) {
-                // LIKE: increment and mark as liked
                 btn.classList.add('liked');
                 currentCount += 1;
                 countEl.textContent = currentCount;
@@ -612,7 +1319,6 @@
                     localStorage.removeItem(likedKey);
                 }
             } else {
-                // UNLIKE: decrement and remove
                 btn.classList.remove('liked');
                 currentCount = Math.max(0, currentCount - 1);
                 countEl.textContent = currentCount;
@@ -633,20 +1339,6 @@
             }
 
             btn.dataset.busy = "false";
-        };
-
-        // Share blog URL
-        window.shareBlog = function(blogId) {
-            const url = window.location.origin + window.location.pathname + `#blog-${blogId}`;
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(url).then(() => {
-                    showToast();
-                }).catch(() => {
-                    prompt("Copy blog link:", url);
-                });
-            } else {
-                prompt("Copy blog link:", url);
-            }
         };
 
         function showToast() {
